@@ -5,7 +5,7 @@ on:
     branches: [ main, release*, feature* ]
     tags: [ v* ]
   pull_request:
-    branches: [ main, release* ]
+    branches: [ main, release*, feature* ]
 
 env:
   ECLINT_VERSION: "0.3.3"
