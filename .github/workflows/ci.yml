@@ -75,6 +75,35 @@ jobs:
       - name: "[Build] - Build"
         run: dotnet build --configuration Release
 
+      - name: "[Build, Docker] - Set up QEMU"
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows' }}
+        uses: docker/setup-qemu-action@v2
+
+      - name: "[Build, Docker] - Set up Docker Buildx"
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows' }}
+        uses: docker/setup-buildx-action@v2
+
+      - name: "[Build, Docker] - Login to DockerHub"
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: "[Build, Docker] - Build and push"
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows' }}
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags:
+            corgibytes/freshli-agent-dotnet:latest,
+            corgibytes/freshli-agent-dotnet:${{ steps.gitversion.outputs.majorMinorPatch }},
+            corgibytes/freshli-agent-dotnet:${{ steps.gitversion.outputs.semVer }}-${{ steps.gitversion.outputs.fullBuildMetadata }}
+          cache-from: type=registry,ref=corgibytes/freshli-agent-dotnet:buildcache
+          cache-to: type=registry,ref=corgibytes/freshli-agent-dotnet:buildcache,mode=max
+
       - name: "[Build] - Setup for Acceptance Test Coverage Collection, and for running the linters"
         run: |
           dotnet tool restore
@@ -82,6 +111,29 @@ jobs:
       - name: "[Build] - dotnet build"
         run: |
           dotnet build -o exe
+
+      - name: "[Lint] - Install eclint on Linux"
+        if: runner.os != 'Windows'
+        run: |
+          curl -L https://gitlab.com/greut/eclint/-/releases/v$ECLINT_VERSION/downloads/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz -o /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz && \
+          mkdir -p $HOME/.local/opt/eclint && \
+          tar -zxvf /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz -C $HOME/.local/opt/eclint && \
+          rm /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz
+          echo "$HOME/.local/opt/eclint" >> $GITHUB_PATH
+
+      - name: "[Lint] - Install eclint on Windows"
+        if: runner.os == 'Windows'
+        run: |
+          New-Item -Type Directory -Force $HOME\.local\opt\eclint
+          Invoke-WebRequest -Uri https://gitlab.com/greut/eclint/-/releases/v$env:ECLINT_VERSION/downloads/eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz -OutFile $HOME\.local\opt\eclint\eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz
+          Set-Location $HOME\.local\opt\eclint
+          tar -zxvf .\eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz
+          Write-Output "$HOME\.local\opt\eclint" | Out-File -Append $env:GITHUB_PATH
+
+      - name: "[Lint] - Run all linters"
+        run: |
+          dotnet format --verify-no-changes --severity info
+          dotnet jb inspectcode --build --output=resharper.temp --format=text "--toolset-path=\"#{msbuild_dll_path}\" freshli-agent-dotnet.sln"
 
       - name: "[Test] - Test, Generate Code Coverage"
         run: |
