@@ -133,7 +133,7 @@ jobs:
       - name: "[Lint] - Run all linters"
         run: |
           dotnet format --verify-no-changes --severity info
-          dotnet jb inspectcode --build --output=resharper.temp --format=text "--toolset-path=\"#{msbuild_dll_path}\" freshli-agent-dotnet.sln"
+          dotnet jb inspectcode --build --output=resharper.temp --format=text freshli-agent-dotnet.sln
 
       - name: "[Test] - Test, Generate Code Coverage"
         run: |
