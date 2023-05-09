@@ -1,4 +1,5 @@
 using Xunit;
+using Assert = Xunit.Assert;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test;
 
@@ -9,6 +10,7 @@ public class ProgramTest
     {
         string path = "./../../../";
         string command = "detect-manifests";
-        Task.Run(async () => await Program.Main(command, path));
+        int exitCode = Program.Main(command, path);
+        Assert.Equal(0, exitCode);
     }
 }

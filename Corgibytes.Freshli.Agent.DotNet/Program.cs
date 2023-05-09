@@ -8,11 +8,11 @@ namespace Corgibytes.Freshli.Agent.DotNet;
 
 public static class Program
 {
-    public static async Task<int> Main(params string[] args)
+    public static int Main(params string[] args)
     {
-        return await new CommandLineBuilder(new MainCommand())
+        return new CommandLineBuilder(new MainCommand())
             .UseDefaults()
             .Build()
-            .InvokeAsync(args);
+            .Invoke(args);
     }
 }
