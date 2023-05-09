@@ -10,7 +10,7 @@ public class ValidatingRepositories : Command
         "https://github.com/dotnet/docs",
         "https://github.com/questdb/questdb",
         "https://github.com/protocolbuffers/protobuf",
-        "https://github.com/serverless/serverless"
+        "https://github.com/corgibytes/freshli-fixture-csharp-test",
     };
 
     public ValidatingRepositories() :
