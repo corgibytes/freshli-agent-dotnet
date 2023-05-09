@@ -6,7 +6,7 @@ using Corgibytes.Freshli.Agent.DotNet.Commands;
 
 namespace Corgibytes.Freshli.Agent.DotNet;
 
-public class Program
+public static class Program
 {
     public static async Task<int> Main(params string[] args)
     {
