@@ -7,13 +7,13 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Commands;
 
 public class DetectManifestsTest
 {
-    private readonly StringWriter _consoleOutput = new();
-
-    public DetectManifestsTest() => Console.SetOut(_consoleOutput);
-
     [Fact]
     public void Run_onProjectPath()
     {
+        StringWriter consoleOutput = new();
+        TextWriter previousOut = Console.Out;
+        Console.SetOut(consoleOutput);
+
         string path = "./../../../";
         DirectoryInfo? directoryInfo = new DirectoryInfo(path).Parent;
         if (directoryInfo == null)
@@ -26,6 +26,8 @@ public class DetectManifestsTest
         string testProjectFile = "Corgibytes.Freshli.Agent.DotNet.Test/Corgibytes.Freshli.Agent.DotNet.Test.csproj";
         string expected =
             $"{agentProjectFile}{Environment.NewLine}{testProjectFile}{Environment.NewLine}";
-        _consoleOutput.ToString().Should().Be(expected);
+        consoleOutput.ToString().Should().Be(expected);
+
+        Console.SetOut(previousOut);
     }
 }
