@@ -1,27 +1,20 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Corgibytes.Freshli.Lib;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Commands;
 
 public class DetectManifests : Command
 {
-    private ManifestService ManifestService { get; }
-    private IFileHistoryFinderRegistry FileHistoryFinderRegistry { get; }
+    private ManifestDetector ManifestDetector { get; }
 
     public DetectManifests() : base("detect-manifests", "Detects manifest files in the specified directory")
     {
         var pathArgument =
             new Argument<DirectoryInfo>("path", "Source code repository path") { Arity = ArgumentArity.ExactlyOne };
         AddArgument(pathArgument);
-
-        ManifestFinderRegistry.RegisterAll();
-
-        FileHistoryFinderRegistry = new FileHistoryFinderRegistry();
-        FileHistoryFinderRegistry.Register<GitFileHistoryFinder>();
-        FileHistoryFinderRegistry.Register<LocalFileHistoryFinder>();
-
-        ManifestService = new ManifestService();
+        ManifestDetector = new ManifestDetector();
 
         Handler = CommandHandler.Create<DirectoryInfo>(Run);
     }
@@ -29,10 +22,7 @@ public class DetectManifests : Command
     public void Run(DirectoryInfo path)
     {
         string analysisPath = path.FullName;
-        var fileHistoryService = new FileHistoryService(FileHistoryFinderRegistry);
-        IFileHistoryFinder? fileHistoryFinder = fileHistoryService.SelectFinderFor(analysisPath);
-
-        IEnumerable<AbstractManifestFinder>? manifestFinders = ManifestService.SelectFindersFor(analysisPath, fileHistoryFinder);
+        IEnumerable<AbstractManifestFinder> manifestFinders = ManifestDetector.ManifestFinders(analysisPath);
         foreach (AbstractManifestFinder manifestFinder in manifestFinders)
         {
             foreach (string? manifestFile in manifestFinder.GetManifestFilenames(analysisPath))
