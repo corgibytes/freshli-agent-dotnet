@@ -20,11 +20,12 @@ public partial class ManifestProcessor
         string outDir = manifestDir.FullName + "/obj";
         ProcessStartInfo startInfo = new()
         {
-            FileName = "dotnet",
-            Arguments = $"dotnet-CycloneDX {manifestFilePath} -j -o {outDir}",
+            FileName = "/usr/local/bin/cyclonedx",
+            Arguments = $"{manifestFilePath} -j -o {outDir}",
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            WorkingDirectory = manifestDir.FullName
         };
         var proc = Process.Start(startInfo);
 
