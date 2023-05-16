@@ -16,17 +16,16 @@ public class ProcessManifest : Command
             Arity = ArgumentArity.ExactlyOne
         };
         AddArgument(manifestFileArgument);
-         var asOfDate = new Argument<DateTimeOffset>("asOfDate") { Arity = ArgumentArity.ZeroOrOne };
+        var asOfDate = new Argument<DateTimeOffset>("asOfDate") { Arity = ArgumentArity.ZeroOrOne };
         AddArgument(asOfDate);
 
-        Handler = CommandHandler.Create<string,DateTimeOffset?>(Run);
+        Handler = CommandHandler.Create<string, DateTimeOffset?>(Run);
 
         ManifestProcessor = new ManifestProcessor();
     }
 
     public void Run(string manifestFile, DateTimeOffset? asOfDate)
     {
-
         string bomFilePath = ManifestProcessor.ProcessManifest(manifestFile, asOfDate);
         Console.WriteLine(bomFilePath);
     }

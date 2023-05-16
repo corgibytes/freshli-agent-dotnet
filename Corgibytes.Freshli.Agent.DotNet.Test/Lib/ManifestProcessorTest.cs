@@ -6,7 +6,6 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;
 
 public class ManifestProcessorTest
 {
-
     [Fact]
     public void ProcessManifest()
     {
@@ -16,7 +15,7 @@ public class ManifestProcessorTest
         string bomFilePath = manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Now.AddMonths(-3));
         Assert.NotEmpty(bomFilePath);
 
-        string expectedBomFilePath = projectFile.Parent.FullName + "/obj/bom.json";
+        string expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
         Assert.Equal(expectedBomFilePath, bomFilePath);
     }
 

@@ -4,11 +4,20 @@ using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
-public class ManifestProcessor
+public partial class ManifestProcessor
 {
     public string ProcessManifest(string manifestFilePath, DateTimeOffset? asOfDate)
     {
-        string outDir = new DirectoryInfo(manifestFilePath).Parent.FullName + "/obj";
+        if (asOfDate != null)
+        {
+            // do nothing at the moment.
+        }
+        var manifestDir = new DirectoryInfo(manifestFilePath);
+        if (manifestDir.Parent != null)
+        {
+            manifestDir = manifestDir.Parent;
+        }
+        string outDir = manifestDir.FullName + "/obj";
         ProcessStartInfo startInfo = new()
         {
             FileName = "dotnet",
@@ -27,13 +36,17 @@ public class ManifestProcessor
         return ExtractFile(output);
     }
 
+    [GeneratedRegex(".*Writing to:(.*)$", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex FilenameFinderRegex();
+
     public static string ExtractFile(string content)
     {
-        Match match = Regex.Match(content, @".*Writing to:(.*)$", RegexOptions.IgnoreCase);
+        Match match = FilenameFinderRegex().Match(content);
         if (match is { Success: true, Groups.Count: > 0 })
         {
             return match.Groups[1].ToString().Trim();
         }
+
         throw new ManifestProcessingException(
             $"Failed to generate bill of materials. See command output for more information:{Environment.NewLine}{content}");
     }
