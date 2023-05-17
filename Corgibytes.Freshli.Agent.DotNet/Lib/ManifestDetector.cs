@@ -6,7 +6,6 @@ namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
 public class ManifestDetector
 {
-    private ManifestService ManifestService { get; }
     private IFileHistoryFinderRegistry FileHistoryFinderRegistry { get; }
     private FileHistoryService FileHistoryService { get; }
 
@@ -18,7 +17,6 @@ public class ManifestDetector
         FileHistoryFinderRegistry.Register<GitFileHistoryFinder>();
         FileHistoryFinderRegistry.Register<LocalFileHistoryFinder>();
 
-        ManifestService = new ManifestService();
         FileHistoryService = new FileHistoryService(FileHistoryFinderRegistry);
     }
 
