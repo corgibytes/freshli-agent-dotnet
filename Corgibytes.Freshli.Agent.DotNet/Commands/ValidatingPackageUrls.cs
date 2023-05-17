@@ -7,9 +7,9 @@ public class ValidatingPackageUrls : Command
 {
     readonly List<string> _packageUrls = new()
     {
-        "pkg:nuget/org.nuget/packages/Corgibytes.Freshli.Lib",
-        "pkg:nuget/org.nuget/packages/System.CommandLine",
-        "pkg:nuget/org.nuget/packages/Microsoft.CSharp",
+        "pkg:nuget/Corgibytes.Freshli.Lib@0.5.0",
+        "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1",
+        "pkg:nuget/Microsoft.CSharp@4.7.0",
     };
 
     public ValidatingPackageUrls() :
