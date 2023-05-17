@@ -7,7 +7,6 @@ public class ValidatingRepositories : Command
 {
     readonly List<string> _repositoryUrls = new()
     {
-        "https://github.com/protocolbuffers/protobuf",
         "https://github.com/corgibytes/freshli-fixture-csharp-test",
     };
 
