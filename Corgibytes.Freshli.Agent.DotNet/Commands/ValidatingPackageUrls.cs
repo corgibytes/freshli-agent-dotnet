@@ -16,8 +16,8 @@ public class ValidatingPackageUrls : Command
 
     public void Run()
     {
-        List<string> _packageUrls = ValidatingData.PackageUrls();
-        foreach (string packageUrl in _packageUrls)
+        List<string> packageUrls = ValidatingData.PackageUrls();
+        foreach (string packageUrl in packageUrls)
         {
             Console.WriteLine(packageUrl);
         }
