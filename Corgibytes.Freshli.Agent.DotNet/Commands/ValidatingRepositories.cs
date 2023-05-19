@@ -1,15 +1,11 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using Corgibytes.Freshli.Agent.DotNet.Lib;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Commands;
 
 public class ValidatingRepositories : Command
 {
-    readonly List<string> _repositoryUrls = new()
-    {
-        "https://github.com/corgibytes/freshli-fixture-csharp-test",
-    };
-
     public ValidatingRepositories() :
         base("validating-repositories",
             "Lists repositories that can be used to validate this agent")
@@ -19,7 +15,8 @@ public class ValidatingRepositories : Command
 
     public void Run()
     {
-        foreach (string repositoryUrl in _repositoryUrls)
+        List<string> repositoryUrls = ValidatingData.RepositoryUrls();
+        foreach (string repositoryUrl in repositoryUrls)
         {
             Console.WriteLine(repositoryUrl);
         }

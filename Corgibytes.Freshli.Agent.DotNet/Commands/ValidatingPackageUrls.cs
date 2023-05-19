@@ -1,16 +1,11 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using Corgibytes.Freshli.Agent.DotNet.Lib;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Commands;
 
 public class ValidatingPackageUrls : Command
 {
-    readonly List<string> _packageUrls = new()
-    {
-        "pkg:nuget/Corgibytes.Freshli.Lib@0.5.0",
-        "pkg:nuget/System.CommandLine@2.0.0-beta4.22272.1",
-        "pkg:nuget/Microsoft.CSharp@4.7.0",
-    };
 
     public ValidatingPackageUrls() :
         base("validating-package-urls",
@@ -21,6 +16,7 @@ public class ValidatingPackageUrls : Command
 
     public void Run()
     {
+        List<string> _packageUrls = ValidatingData.PackageUrls();
         foreach (string packageUrl in _packageUrls)
         {
             Console.WriteLine(packageUrl);

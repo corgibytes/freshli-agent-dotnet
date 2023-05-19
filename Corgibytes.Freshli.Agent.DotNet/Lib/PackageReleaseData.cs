@@ -10,8 +10,8 @@ public class PackageReleaseData
         ReleasedAt = releasedAt;
     }
 
-    private string Version { get; }
-    private DateTime ReleasedAt { get; }
+    public string Version { get; }
+    public DateTime ReleasedAt { get; }
 
     public override string ToString() => $"{Version}\t{ReleasedAt.ToString(s_releasedAtFormat)}";
 }
