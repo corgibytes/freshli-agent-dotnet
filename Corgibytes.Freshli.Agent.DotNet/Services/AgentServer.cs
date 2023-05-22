@@ -32,7 +32,7 @@ public class AgentServer
             _application.MapGrpcReflectionService();
         }
 
-        _application.Run($"http://localhost:{Port}");
+        _application.Run($"http://0.0.0.0:{Port}");
         s_instance = this;
     }
 
