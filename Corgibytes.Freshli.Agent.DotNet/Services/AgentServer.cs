@@ -22,7 +22,6 @@ public class AgentServer
         builder.Services.AddGrpcReflection();
         _application = builder.Build();
 
-
         _application.MapGrpcService<AgentService>();
         _application.MapGet("/",
             () =>
@@ -33,7 +32,7 @@ public class AgentServer
             _application.MapGrpcReflectionService();
         }
 
-        _application.Run();
+        _application.Run($"http://localhost:{Port}");
         s_instance = this;
     }
 
