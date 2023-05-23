@@ -18,10 +18,11 @@ public partial class ManifestProcessor
             manifestDir = manifestDir.Parent;
         }
         string outDir = manifestDir.FullName + "/obj";
+        // use -dgl for now to avoid hitting Github rate limit
         ProcessStartInfo startInfo = new()
         {
             FileName = "/usr/local/bin/cyclonedx",
-            Arguments = $"{manifestFilePath} -j -o {outDir}",
+            Arguments = $"{manifestFilePath} -dgl -j -o {outDir}",
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
