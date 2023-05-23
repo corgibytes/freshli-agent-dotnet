@@ -38,7 +38,7 @@ public class AgentService : Agent.AgentBase
             string[] filenames = manifestFinder.GetManifestFilenames(projectLocation);
             foreach (string filename in filenames)
             {
-                responseStream.WriteAsync(new ManifestLocation() { Path = filename });
+                responseStream.WriteAsync(new ManifestLocation() { Path = Path.Combine(projectLocation, filename) });
             }
         }
 
