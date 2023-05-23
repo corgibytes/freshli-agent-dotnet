@@ -11,7 +11,12 @@ public class ManifestDetector
 
     public ManifestDetector()
     {
-        ManifestFinderRegistry.RegisterAll();
+        // if the Finders collection is not empty, then
+        // all the finders have been registered already
+        if (ManifestFinderRegistry.Finders.Count == 0)
+        {
+            ManifestFinderRegistry.RegisterAll();
+        }
 
         FileHistoryFinderRegistry = new FileHistoryFinderRegistry();
         FileHistoryFinderRegistry.Register<GitFileHistoryFinder>();
