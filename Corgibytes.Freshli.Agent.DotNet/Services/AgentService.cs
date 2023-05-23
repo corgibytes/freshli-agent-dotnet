@@ -66,7 +66,7 @@ public class AgentService : Agent.AgentBase
     public override Task<Empty> Shutdown(Empty request, ServerCallContext context)
     {
         _logger.LogInformation("Shutdown()");
-        AgentServer.Instance()!.stop();
+        AgentServer.Instance()!.Stop();
         return Task.FromResult(new Empty());
     }
 

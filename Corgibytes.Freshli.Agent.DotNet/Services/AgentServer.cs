@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,7 +44,7 @@ public class AgentServer
         s_instance = this;
     }
 
-    public void stop()
+    public void Stop()
     {
         Task.Run(async () => { await _application!.DisposeAsync(); });
     }
