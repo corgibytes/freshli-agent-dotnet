@@ -18,8 +18,10 @@
     <PackageReference Include="Corgibytes.Freshli.Lib" Version="0.5.0" />
     <PackageReference Include="Google.Protobuf" Version="3.23.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.53.0" />
+    <PackageReference Include="Grpc.AspNetCore.HealthChecks" Version="2.53.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.53.0" />
     <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.HealthCheck" Version="2.53.0" />
     <PackageReference Include="Grpc.Tools" Version="2.54.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
