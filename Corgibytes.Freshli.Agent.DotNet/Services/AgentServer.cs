@@ -37,11 +37,7 @@ public class AgentServer
                 "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909"
         );
         _application.MapGrpcHealthChecksService();
-
-        if (_application.Environment.IsDevelopment())
-        {
-            _application.MapGrpcReflectionService();
-        }
+        _application.MapGrpcReflectionService();
 
         _application.Run($"http://0.0.0.0:{Port}");
         s_instance = this;
