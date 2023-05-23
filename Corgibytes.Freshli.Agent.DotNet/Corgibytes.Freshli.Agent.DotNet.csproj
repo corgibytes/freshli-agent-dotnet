@@ -8,6 +8,7 @@
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
     <Product>freshli-agent-dotnet</Product>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <AssemblyName>freshli-agent-dotnet</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
