@@ -19,10 +19,10 @@ public class AgentServer
 
     public void Start()
     {
-        string contentRoot = Environment.GetEnvironmentVariable("FRESHLI_AGENT_DOTNET_CONTENT_ROOT") ??
-                             "/app/freshli-agent-dotnet/Corgibytes.Freshli.Agent.DotNet";
+        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
         WebApplicationBuilder builder = WebApplication.CreateBuilder(
-            new WebApplicationOptions() { ContentRootPath = contentRoot });
+            new WebApplicationOptions() { ContentRootPath = assemblyPath });
         builder.Logging.ClearProviders().AddConsole();
         builder.Services.AddGrpc();
         builder.Services.AddGrpcHealthChecks();
