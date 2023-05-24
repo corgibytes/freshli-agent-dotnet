@@ -18,6 +18,17 @@ public partial class ManifestProcessor
             manifestDir = manifestDir.Parent;
         }
         string outDir = manifestDir.FullName + "/obj";
+        if (!Directory.Exists(outDir))
+        {
+            try
+            {
+                Directory.CreateDirectory(outDir);
+            }
+            catch (SystemException error)
+            {
+                throw new ManifestProcessingException($"Failed creating {outDir}: " + error.Message);
+            }
+        }
         // use -dgl for now to avoid hitting Github rate limit
         ProcessStartInfo startInfo = new()
         {

@@ -1,3 +1,4 @@
+using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Corgibytes.Freshli.Lib;
 using Google.Protobuf.WellKnownTypes;
@@ -22,9 +23,20 @@ public class AgentService : Agent.AgentBase
         DateTimeOffset asOfDate = request.Moment?.ToDateTimeOffset() ?? DateTimeOffset.Now;
         _logger.LogInformation("ProcessManifest() - manifestPath: {ManifestPath}, asOfDate: {AsOfDate}",
             request.Manifest.Path, asOfDate.ToString());
-        string bomLocation =
-            _manifestProcessor.ProcessManifest(request.Manifest.Path, asOfDate);
-        return Task.FromResult(new BomLocation() { Path = bomLocation });
+        try
+        {
+            string bomLocation =
+                _manifestProcessor.ProcessManifest(request.Manifest.Path, asOfDate);
+            return Task.FromResult(new BomLocation() { Path = bomLocation });
+        }
+        catch (ManifestProcessingException error)
+        {
+            string errorMessage = $"Error processing {request.Manifest.Path}@{asOfDate}: {error.Message}";
+            _logger.LogError("{ErrorMessage}", errorMessage);
+            throw new RpcException(
+                new Status(StatusCode.Internal, "Processing Error"),
+                errorMessage);
+        }
     }
 
     public override Task DetectManifests(ProjectLocation request, IServerStreamWriter<ManifestLocation> responseStream,
