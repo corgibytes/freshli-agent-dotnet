@@ -20,7 +20,7 @@ public class AgentServer
 
     public void Start()
     {
-        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string? assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(
             new WebApplicationOptions() { ContentRootPath = assemblyPath });
