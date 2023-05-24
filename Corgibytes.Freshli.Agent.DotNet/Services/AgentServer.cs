@@ -1,5 +1,8 @@
+using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,10 +27,21 @@ public class AgentServer
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(
             new WebApplicationOptions() { ContentRootPath = assemblyPath });
+
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Listen(IPAddress.Any, Port, listenOptions =>
+            {
+                listenOptions.Protocols = HttpProtocols.Http2;
+            });
+        });
+
         builder.Logging.ClearProviders().AddConsole();
-        builder.Services.AddGrpc();
+        builder.Services.AddGrpc(configure => configure.EnableDetailedErrors = true);
         builder.Services.AddGrpcHealthChecks();
         builder.Services.AddGrpcReflection();
+
+
 
         _application = builder.Build();
 
