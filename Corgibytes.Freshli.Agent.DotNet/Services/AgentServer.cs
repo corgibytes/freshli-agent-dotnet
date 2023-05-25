@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Services;
@@ -37,15 +37,13 @@ public class AgentServer
         });
 
         builder.Logging.ClearProviders().AddConsole();
+
         builder.Services.AddGrpc(configure => configure.EnableDetailedErrors = true);
-        builder.Services.AddGrpcHealthChecks();
+        builder.Services.AddGrpcHealthChecks()
+            .AddCheck("Agent", () => HealthCheckResult.Healthy());
         builder.Services.AddGrpcReflection();
 
-
-
         _application = builder.Build();
-
-
         _application.MapGrpcService<AgentService>();
         _application.MapGet("/",
             () =>
