@@ -50,7 +50,10 @@ public class AgentService : Agent.AgentBase
             string[] filenames = manifestFinder.GetManifestFilenames(projectLocation);
             foreach (string filename in filenames)
             {
-                responseStream.WriteAsync(new ManifestLocation() { Path = Path.Combine(projectLocation, filename) });
+                responseStream.WriteAsync(
+                    new ManifestLocation() { Path = Path.Combine(projectLocation, filename) },
+                    context.CancellationToken
+                );
             }
         }
 
@@ -70,7 +73,7 @@ public class AgentService : Agent.AgentBase
                 {
                     ReleasedAt = release.ReleasedAt.ToTimestamp(),
                     Version = release.Version
-                });
+                }, context.CancellationToken);
             });
         return Task.CompletedTask;
     }
@@ -89,7 +92,7 @@ public class AgentService : Agent.AgentBase
         List<string> packageUrls = ValidatingData.PackageUrls();
         foreach (string packageUrl in packageUrls)
         {
-            responseStream.WriteAsync(new Package() { Purl = packageUrl });
+            responseStream.WriteAsync(new Package() { Purl = packageUrl }, context.CancellationToken);
         }
 
         return Task.CompletedTask;
@@ -102,7 +105,7 @@ public class AgentService : Agent.AgentBase
         List<string> repositoryUrls = ValidatingData.RepositoryUrls();
         foreach (string repositoryUrl in repositoryUrls)
         {
-            responseStream.WriteAsync(new RepositoryLocation() { Url = repositoryUrl });
+            responseStream.WriteAsync(new RepositoryLocation() { Url = repositoryUrl }, context.CancellationToken);
         }
 
         return Task.CompletedTask;
