@@ -1,26 +1,46 @@
 using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Corgibytes.Freshli.Lib;
+using Corgibytes.Freshli.Lib.Test;
 using Xunit;
-using Assert = Xunit.Assert;
+using Xunit.Abstractions;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;
 
 public class ManifestDetectorTest
 {
+    private readonly ITestOutputHelper _output;
+
+    private readonly ManifestDetector _manifestDetector = new();
+
+    public ManifestDetectorTest(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     [Fact]
     public void ManifestFinders()
     {
-        var manifestDetector = new ManifestDetector();
-        string analysisPath = new DirectoryInfo("./../../../../").FullName;
+        string analysisPath = Fixtures.Path();
+        IEnumerable<AbstractManifestFinder> manifestFinders = _manifestDetector.ManifestFinders(analysisPath).ToList();
+        foreach (AbstractManifestFinder abstractManifestFinder in manifestFinders)
+        {
+            _output.WriteLine($"ManifestFinder: {abstractManifestFinder.GetType()}");
+        }
 
-        IEnumerable<AbstractManifestFinder> manifestFinders = manifestDetector.ManifestFinders(analysisPath).ToList();
-        Assert.Single(manifestFinders);
-        AbstractManifestFinder finder = manifestFinders.First();
-        string[] manifestFilenames = finder.GetManifestFilenames(analysisPath);
-        Assert.Equal(2, manifestFilenames.Length);
-        Assert.Equal("Corgibytes.Freshli.Agent.DotNet/Corgibytes.Freshli.Agent.DotNet.csproj",
-            manifestFilenames[0]);
-        Assert.Equal("Corgibytes.Freshli.Agent.DotNet.Test/Corgibytes.Freshli.Agent.DotNet.Test.csproj",
-            manifestFilenames[1]);
+        Assert.Equal(2, manifestFinders.Count());
+    }
+
+    [Fact]
+    public void FindManifests()
+    {
+        string analysisPath = Fixtures.Path();
+        IEnumerable<string> manifests = _manifestDetector.FindManifests(analysisPath);
+        foreach (string manifestFile in manifests)
+        {
+            _output.WriteLine($"ManifestFinder: {manifestFile}");
+        }
+
+
+        Assert.Equal(2, manifests.Count());
     }
 }

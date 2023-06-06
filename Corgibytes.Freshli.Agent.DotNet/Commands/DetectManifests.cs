@@ -1,7 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Lib;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Commands;
 
@@ -22,15 +21,11 @@ public class DetectManifests : Command
     public void Run(DirectoryInfo path)
     {
         string analysisPath = path.FullName;
-        IEnumerable<AbstractManifestFinder> manifestFinders = ManifestDetector.ManifestFinders(analysisPath);
-        foreach (AbstractManifestFinder manifestFinder in manifestFinders)
+        foreach (string? manifestFile in ManifestDetector.FindManifests(analysisPath))
         {
-            foreach (string? manifestFile in manifestFinder.GetManifestFilenames(analysisPath))
-            {
-                Console.WriteLine(
-                    "{0}", manifestFile.Replace(analysisPath, "")
-                );
-            }
+            Console.WriteLine(
+                "{0}", manifestFile.Replace(analysisPath, "")
+            );
         }
     }
 }

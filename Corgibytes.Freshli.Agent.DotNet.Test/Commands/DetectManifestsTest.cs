@@ -9,7 +9,7 @@ public class DetectManifestsTest
     [Fact]
     public void Run_onProjectPath()
     {
-        string path = "./../../../";
+        string path = "./../../";
         DirectoryInfo? directoryInfo = new DirectoryInfo(path).Parent;
         if (directoryInfo == null)
         {

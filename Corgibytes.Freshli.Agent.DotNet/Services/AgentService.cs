@@ -1,6 +1,5 @@
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Lib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -44,17 +43,12 @@ public class AgentService : Agent.AgentBase
     {
         string projectLocation = request.Path;
         _logger.LogInformation("DetectManifests() - {ProjectLocation}", projectLocation);
-        IEnumerable<AbstractManifestFinder> manifestFinders = new ManifestDetector().ManifestFinders(projectLocation);
-        foreach (AbstractManifestFinder manifestFinder in manifestFinders)
+        foreach (string filename in new ManifestDetector().FindManifests(projectLocation))
         {
-            string[] filenames = manifestFinder.GetManifestFilenames(projectLocation);
-            foreach (string filename in filenames)
-            {
-                responseStream.WriteAsync(
-                    new ManifestLocation() { Path = Path.Combine(projectLocation, filename) },
-                    context.CancellationToken
-                );
-            }
+            responseStream.WriteAsync(
+                new ManifestLocation() { Path = Path.Combine(projectLocation, filename) },
+                context.CancellationToken
+            );
         }
 
         return Task.CompletedTask;

@@ -1,22 +1,24 @@
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
+using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Corgibytes.Freshli.Lib;
-using Corgibytes.Freshli.Lib.Languages.CSharp;
+using Microsoft.Extensions.Logging;
+using NuGet.Packaging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
 public class ManifestDetector
 {
+    private readonly ILogger<ManifestDetector> _logger = Logging.Logger<ManifestDetector>();
+
     private IFileHistoryFinderRegistry FileHistoryFinderRegistry { get; }
     private FileHistoryService FileHistoryService { get; }
+    private ManifestFinderRegistry ManifestFinderRegistry { get;  }
 
     public ManifestDetector()
     {
-        // if the Finders collection is not empty, then
-        // all the finders have been registered already
-        if (ManifestFinderRegistry.Finders.Count == 0)
-        {
-            ManifestFinderRegistry.RegisterAll();
-        }
+        ManifestFinderRegistry = new ManifestFinderRegistry();
+        ManifestFinderRegistry.Register<NuGetManifestFinder>();
+        ManifestFinderRegistry.Register<PackagesManifestFinder>();
 
         FileHistoryFinderRegistry = new FileHistoryFinderRegistry();
         FileHistoryFinderRegistry.Register<GitFileHistoryFinder>();
@@ -35,12 +37,22 @@ public class ManifestDetector
 
         IEnumerable<AbstractManifestFinder> manifestFinders =
             ManifestFinderRegistry.Finders
-                .Where(finder => finder is NuGetManifestFinder)
                 .Select(finder =>
                 {
                     finder.FileFinder = fileHistoryFinder;
                     return finder;
                 });
         return manifestFinders;
+    }
+
+    public IEnumerable<string> FindManifests(string analysisPath)
+    {
+        IList<string> manifests = new List<string>();
+        foreach (AbstractManifestFinder finder in ManifestFinders(analysisPath))
+        {
+            manifests.AddRange(finder.GetManifestFilenames(analysisPath));
+        }
+
+        return manifests;
     }
 }

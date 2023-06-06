@@ -5,6 +5,8 @@ namespace Corgibytes.Freshli.Agent.DotNet.Exceptions;
 [Serializable]
 public class ManifestProcessingException : Exception
 {
+    private string? Details { get; set; }
+
     public ManifestProcessingException()
     {
     }
@@ -20,4 +22,7 @@ public class ManifestProcessingException : Exception
     public ManifestProcessingException(string? message, Exception? innerException) : base(message, innerException)
     {
     }
+
+    public ManifestProcessingException(string? message, string? details) :
+        base(message) => Details = details;
 }

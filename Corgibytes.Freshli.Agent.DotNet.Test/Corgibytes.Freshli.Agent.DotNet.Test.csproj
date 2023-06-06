@@ -22,4 +22,37 @@
       <ProjectReference Include="..\Corgibytes.Freshli.Agent.DotNet\Corgibytes.Freshli.Agent.DotNet.csproj" />
     </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fixtures\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+<!--    <None Update="Fixtures\csproj\**">-->
+<!--      <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
+<!--    </None>-->
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures\csproj\Project.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Fixtures\csproj\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="obj\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Fixtures\csproj\Project.csproj" />
+  </ItemGroup>
+
+
+  <Target Name="CleanFixtureDir" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutputPath)/Fixtures" />
+  </Target>
+
 </Project>
