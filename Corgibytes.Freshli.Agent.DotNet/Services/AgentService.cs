@@ -32,6 +32,7 @@ public class AgentService : Agent.AgentBase
         {
             string errorMessage = $"Error processing {request.Manifest.Path}@{asOfDate}: {error.Message}";
             _logger.LogError("{ErrorMessage}", errorMessage);
+            _logger.LogDebug("Exception.details: {Detail}", error.Details);
             throw new RpcException(
                 new Status(StatusCode.Internal, "Processing Error"),
                 errorMessage);

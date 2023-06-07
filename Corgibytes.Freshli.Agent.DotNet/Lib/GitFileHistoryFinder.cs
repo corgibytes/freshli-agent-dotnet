@@ -1,128 +1,107 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Corgibytes.Freshli.Agent.DotNet.Lib;
 using LibGit2Sharp;
 
-namespace Corgibytes.Freshli.Lib
+namespace Corgibytes.Freshli.Agent.DotNet.Lib;
+
+public class GitFileHistoryFinder : IFileHistoryFinder
 {
-    public class GitFileHistoryFinder : IFileHistoryFinder
+    private readonly Dictionary<string, string> _cloneLocations = new();
+
+    private string NormalizeLocation(string projectRootPath)
     {
-        private Dictionary<string, string> _cloneLocations =
-          new Dictionary<string, string>();
-
-        private string NormalizeLocation(string projectRootPath)
+        if (Repository.IsValid(projectRootPath))
         {
-            if (Repository.IsValid(projectRootPath))
-            {
-                return projectRootPath;
-            }
-
-            if (_cloneLocations.ContainsKey(projectRootPath))
-            {
-                return _cloneLocations[projectRootPath];
-            }
-
-            if (IsCloneable(projectRootPath))
-            {
-                var cloneLocation = GenerateTempCloneLocation();
-                Repository.Clone(projectRootPath, cloneLocation);
-                _cloneLocations[projectRootPath] = cloneLocation;
-                return cloneLocation;
-            }
-
             return projectRootPath;
         }
 
-        public bool DoesPathContainHistorySource(string projectRootPath)
+        if (_cloneLocations.TryGetValue(projectRootPath, out string? location))
         {
-            bool result = Repository.IsValid(projectRootPath);
-            if (!result)
-            {
-                result = IsCloneable(projectRootPath);
-            }
-
-            return result;
+            return location;
         }
 
-        private string GenerateTempCloneLocation()
+        if (IsCloneable(projectRootPath))
         {
-            return Path.Combine(
-              Path.GetTempPath(),
-              Guid.NewGuid().ToString()
-            );
+            string cloneLocation = GenerateTempCloneLocation();
+            Repository.Clone(projectRootPath, cloneLocation);
+            _cloneLocations[projectRootPath] = cloneLocation;
+            return cloneLocation;
         }
 
-        private bool IsCloneable(string url)
+        return projectRootPath;
+    }
+
+    public bool DoesPathContainHistorySource(string projectRootPath)
+    {
+        bool result = Repository.IsValid(projectRootPath);
+        if (!result)
         {
-            var result = true;
-            var options = new CloneOptions { Checkout = false };
-
-            string tempFolder = GenerateTempCloneLocation();
-
-            try
-            {
-                Repository.Clone(url, tempFolder, options);
-            }
-            catch (NotFoundException)
-            {
-                result = false;
-            }
-
-            if (Directory.Exists(tempFolder))
-            {
-                new DirectoryInfo(tempFolder).Delete();
-            }
-
-            return result;
+            result = IsCloneable(projectRootPath);
         }
 
-        private void RecursivelyClearReadOnlyAttribute(string path)
-        {
-            foreach (var childDirectory in Directory.EnumerateDirectories(path))
-            {
-                RecursivelyClearReadOnlyAttribute(childDirectory);
-            }
+        return result;
+    }
 
-            foreach (var childFile in Directory.EnumerateFiles(path))
-            {
-                File.SetAttributes(childFile, FileAttributes.Normal);
-            }
+    private string GenerateTempCloneLocation()
+    {
+        return Path.Combine(
+            Path.GetTempPath(),
+            Guid.NewGuid().ToString()
+        );
+    }
+
+    private bool IsCloneable(string url)
+    {
+        bool result = true;
+        var options = new CloneOptions { Checkout = false };
+
+        string tempFolder = GenerateTempCloneLocation();
+
+        try
+        {
+            Repository.Clone(url, tempFolder, options);
+        }
+        catch (NotFoundException)
+        {
+            result = false;
         }
 
-        public IFileHistory FileHistoryOf(
-          string projectRootPath,
-          string targetFile
-        )
+        if (Directory.Exists(tempFolder))
         {
-            return new GitFileHistory(NormalizeLocation(projectRootPath), targetFile);
+            new DirectoryInfo(tempFolder).Delete();
         }
 
-        public bool Exists(string projectRootPath, string filePath)
-        {
-            string clonedProjectRoot = NormalizeLocation(projectRootPath);
-            return Directory.GetFiles(clonedProjectRoot, filePath).Any();
-        }
+        return result;
+    }
 
-        public string ReadAllText(string projectRootPath, string filePath)
-        {
-            string clonedProjectRoot = NormalizeLocation(projectRootPath);
-            return File.ReadAllText(Path.Combine(clonedProjectRoot, filePath));
-        }
+    public IFileHistory FileHistoryOf(
+        string projectRootPath,
+        string targetFile
+    )
+    {
+        return new GitFileHistory(NormalizeLocation(projectRootPath), targetFile);
+    }
 
-        public string[] GetManifestFilenames(
-          string projectRootPath,
-          string pattern
-        )
-        {
-            string clonedProjectRoot = NormalizeLocation(projectRootPath);
-            return Directory.GetFiles(clonedProjectRoot,
-                                pattern,
-                                SearchOption.AllDirectories)
-                                .Select(f => Path.GetRelativePath(clonedProjectRoot, f))
-                                .ToArray();
-        }
+    public bool Exists(string projectRootPath, string filePath)
+    {
+        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        return Directory.GetFiles(clonedProjectRoot, filePath).Any();
+    }
+
+    public string ReadAllText(string projectRootPath, string filePath)
+    {
+        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        return File.ReadAllText(Path.Combine(clonedProjectRoot, filePath));
+    }
+
+    public string[] GetManifestFilenames(
+        string projectRootPath,
+        string pattern
+    )
+    {
+        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        return Directory.GetFiles(clonedProjectRoot,
+                pattern,
+                SearchOption.AllDirectories)
+            .Select(f => Path.GetRelativePath(clonedProjectRoot, f))
+            .ToArray();
     }
 }

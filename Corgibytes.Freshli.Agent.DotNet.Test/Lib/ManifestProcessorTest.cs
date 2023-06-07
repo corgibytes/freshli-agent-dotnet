@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Lib.Test;
 using Xunit;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;

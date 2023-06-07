@@ -1,5 +1,3 @@
-using Corgibytes.Freshli.Lib;
-
 namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 
 public class PackagesManifestFinder : AbstractManifestFinder

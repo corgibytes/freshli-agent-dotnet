@@ -41,7 +41,8 @@ public partial class ManifestProcessor
         if (File.Exists(outFile))
         {
             var existingOutFile = new FileInfo(outFile);
-            string destFileName = $"bom-{existingOutFile.CreationTime.ToString("yyyyMMdd-HHmmss")}.json";
+            string formattedCreationTime = existingOutFile.CreationTime.ToString("yyyyMMdd-HHmmss");
+            string destFileName = $"bom-{formattedCreationTime}.json";
             _logger.LogDebug("Output file {OutFilename} exists and will be moved to {NewOutFilename}", outFile,
                 destFileName);
             File.Move(existingOutFile.FullName,
@@ -75,6 +76,7 @@ public partial class ManifestProcessor
         {
             return outFile;
         }
+
         return ExtractFile(output);
     }
 

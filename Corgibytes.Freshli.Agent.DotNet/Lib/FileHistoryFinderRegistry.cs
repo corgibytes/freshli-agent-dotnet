@@ -1,16 +1,11 @@
-using Corgibytes.Freshli.Lib;
+namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
-namespace Corgibytes.Freshli.Agent.DotNet.Lib
+public class FileHistoryFinderRegistry : IFileHistoryFinderRegistry
 {
-    public class FileHistoryFinderRegistry : IFileHistoryFinderRegistry
+    public IList<IFileHistoryFinder> Finders { get; } = new List<IFileHistoryFinder>();
+
+    public void Register<TFinder>() where TFinder : IFileHistoryFinder, new()
     {
-        private readonly IList<IFileHistoryFinder> _finders = new List<IFileHistoryFinder>();
-
-        public IList<IFileHistoryFinder> Finders => _finders;
-
-        public void Register<TFinder>() where TFinder : IFileHistoryFinder, new()
-        {
-            Finders.Add(new TFinder());
-        }
+        Finders.Add(new TFinder());
     }
 }

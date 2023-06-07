@@ -1,6 +1,5 @@
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
-using Corgibytes.Freshli.Lib;
 using Microsoft.Extensions.Logging;
 using NuGet.Packaging;
 
@@ -12,7 +11,7 @@ public class ManifestDetector
 
     private IFileHistoryFinderRegistry FileHistoryFinderRegistry { get; }
     private FileHistoryService FileHistoryService { get; }
-    private ManifestFinderRegistry ManifestFinderRegistry { get;  }
+    private ManifestFinderRegistry ManifestFinderRegistry { get; }
 
     public ManifestDetector()
     {
@@ -29,6 +28,7 @@ public class ManifestDetector
 
     public IEnumerable<AbstractManifestFinder> ManifestFinders(string analysisPath)
     {
+        _logger.LogDebug("ManifestFinders({AnalysisPath})", analysisPath);
         IFileHistoryFinder? fileHistoryFinder = FileHistoryService.SelectFinderFor(analysisPath);
         if (fileHistoryFinder is null)
         {
@@ -47,6 +47,7 @@ public class ManifestDetector
 
     public IEnumerable<string> FindManifests(string analysisPath)
     {
+        _logger.LogDebug("FindManifests({AnalysisPath})", analysisPath);
         IList<string> manifests = new List<string>();
         foreach (AbstractManifestFinder finder in ManifestFinders(analysisPath))
         {

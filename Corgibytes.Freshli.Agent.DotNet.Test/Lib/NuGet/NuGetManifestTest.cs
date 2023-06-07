@@ -1,16 +1,15 @@
-using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Xunit;
 
-namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet
+namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet;
+
+public class NuGetManifestTest
 {
-    public class NuGetManifestTest
+    [Fact]
+    public void ParsesFile()
     {
-        [Fact]
-        public void ParsesFile()
-        {
-            var manifest = new NuGetManifest();
-            var testContent = @"<Project Sdk=""Microsoft.NET.Sdk"">
+        var manifest = new NuGetManifest();
+        string testContent = @"<Project Sdk=""Microsoft.NET.Sdk"">
             <ItemGroup>
             <PackageReference Include=""DotNetEnv"" Version=""1.4.0"" />
             <PackageReference Include=""Elasticsearch.Net"" Version=""7.10"" />
@@ -21,9 +20,8 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet
             </ItemGroup>
         </Project>";
 
-            manifest.Parse(testContent);
+        manifest.Parse(testContent);
 
-            Assert.Equal(6, manifest.Count);
-        }
+        Assert.Equal(6, manifest.Count);
     }
 }

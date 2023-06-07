@@ -1,9 +1,8 @@
-namespace Corgibytes.Freshli.Agent.DotNet.Lib
+namespace Corgibytes.Freshli.Agent.DotNet.Lib;
+
+public interface IFileHistory
 {
-    public interface IFileHistory
-    {
-        IList<DateTimeOffset> Dates { get; }
-        string ContentsAsOf(DateTimeOffset date);
-        string ShaAsOf(DateTimeOffset date);
-    }
+    IList<DateTimeOffset> Dates { get; }
+    string ContentsAsOf(DateTimeOffset date);
+    string ShaAsOf(DateTimeOffset date);
 }

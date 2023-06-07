@@ -1,24 +1,23 @@
 using System.Xml;
 
-namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet
+namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
+
+public class NuGetManifest : AbstractManifest
 {
-    public class NuGetManifest : AbstractManifest
+    public override void Parse(string contents)
     {
-        public override void Parse(string contents)
+        var xmlDoc = new XmlDocument();
+        xmlDoc.LoadXml(contents);
+
+        XmlNodeList packages = xmlDoc.GetElementsByTagName("PackageReference");
+        foreach (XmlNode package in packages)
         {
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(contents);
-
-            var packages = xmlDoc.GetElementsByTagName("PackageReference");
-            foreach (XmlNode package in packages)
-            {
-                Add(
-                  package.Attributes[0].Value,
-                  package.Attributes[1].Value
-                );
-            }
+            Add(
+                package.Attributes![0].Value,
+                package.Attributes[1].Value
+            );
         }
-
-        public override bool UsesExactMatches => true;
     }
+
+    public override bool UsesExactMatches => true;
 }

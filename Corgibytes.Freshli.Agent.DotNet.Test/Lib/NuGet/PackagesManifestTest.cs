@@ -9,7 +9,7 @@ public class PackagesManifestTest
     public void ParsesFile()
     {
         var manifest = new PackagesManifest();
-        var testContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        string testContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
             <packages>
             <package id=""DotNetEnv"" version=""1.4.0"" />
             <package id=""Elasticsearch.Net"" version=""7.10"" />

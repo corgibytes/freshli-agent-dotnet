@@ -1,17 +1,16 @@
-namespace Corgibytes.Freshli.Agent.DotNet.Exceptions
-{
-    public class LatestVersionNotFoundException : Exception
-    {
+namespace Corgibytes.Freshli.Agent.DotNet.Exceptions;
 
-        public LatestVersionNotFoundException(
-          string dependency,
-          DateTimeOffset date,
-          Exception exception
-        ) : base(
-          $"Unable to find latest version of {dependency} as of {date:O}.",
-          exception
-        )
-        {
-        }
+public class LatestVersionNotFoundException : Exception
+{
+
+    public LatestVersionNotFoundException(
+        string dependency,
+        DateTimeOffset date,
+        Exception exception
+    ) : base(
+        $"Unable to find latest version of {dependency} as of {date:O}.",
+        exception
+    )
+    {
     }
 }

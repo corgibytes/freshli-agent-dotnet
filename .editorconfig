@@ -188,8 +188,8 @@ csharp_space_between_square_brackets = false
 # Analyzers
 dotnet_code_quality.CA1052.api_surface = private, internal
 dotnet_code_quality.CA1802.api_surface = private, internal
-dotnet_code_quality.CA1822.api_surface = private, internal
 dotnet_code_quality.CA2208.api_surface = public
+dotnet_diagnostic.CA1822.severity = none
 
 # C++ Files
 [*.{cpp,h,in}]
@@ -231,3 +231,7 @@ end_of_line = crlf
 generated_code = true
 dotnet_analyzer_diagnostic.severity = none
 dotnet_diagnostic.CS8981.severity = none
+
+[**/NuGetRepository.cs]
+dotnet_diagnostic.IDE0060.severity = none
+dotnet_diagnostic.CA1822.severity = none

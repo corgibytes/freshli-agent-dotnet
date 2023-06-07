@@ -1,111 +1,108 @@
-//using Corgibytes.Freshli.Lib.Exceptions;
-
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using NuGet.Common;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 
-namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet
+namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
+
+public class NuGetRepository : IPackageRepository
 {
-    public class NuGetRepository : IPackageRepository
+    private readonly IDictionary<string, IEnumerable<NuGetVersionInfo>> _packages
+        = new Dictionary<string, IEnumerable<NuGetVersionInfo>>();
+
+    private IEnumerable<IVersionInfo> GetReleaseHistory(
+        string name,
+        bool includePreReleaseVersions
+    )
     {
-        private IDictionary<string, IEnumerable<NuGetVersionInfo>> _packages
-            = new Dictionary<string, IEnumerable<NuGetVersionInfo>>();
-
-        private IEnumerable<IVersionInfo> GetReleaseHistory(
-            string name,
-            bool includePreReleaseVersions
-        )
+        if (_packages.TryGetValue(name, out IEnumerable<NuGetVersionInfo>? history))
         {
-            if (_packages.ContainsKey(name))
-            {
-                return _packages[name];
-            }
-
-            var versions = GetMetadata(name);
-            _packages[name] = versions
-                .OrderByDescending(nv => nv.Published)
-                .Select(v => new NuGetVersionInfo(
-                    v.Identity.Version,
-                    v.Published.Value.UtcDateTime
-                ));
-
-            return _packages[name];
+            return history;
         }
 
-        private IEnumerable<IPackageSearchMetadata> GetMetadata(string name)
-        {
-            ILogger logger = NullLogger.Instance;
-            CancellationToken cancellationToken = CancellationToken.None;
+        IEnumerable<IPackageSearchMetadata> versions = GetMetadata(name);
+        _packages[name] = versions
+            .OrderByDescending(nv => nv.Published)
+            .Select(v => new NuGetVersionInfo(
+                v.Identity.Version,
+                v.Published!.Value.UtcDateTime
+            ));
 
-            SourceCacheContext cache = new SourceCacheContext();
-            SourceRepository repository = Repository.Factory.GetCoreV3(
-                "https://api.nuget.org/v3/index.json"
-            );
-            PackageMetadataResource resource =
-                repository.GetResourceAsync<PackageMetadataResource>().Result;
+        return _packages[name];
+    }
 
-            IEnumerable<IPackageSearchMetadata> packages = resource.GetMetadataAsync(
-                name,
-                includePrerelease: true,
-                includeUnlisted: false,
-                cache,
-                logger,
-                cancellationToken).Result;
+    private IEnumerable<IPackageSearchMetadata> GetMetadata(string name)
+    {
+        ILogger logger = NullLogger.Instance;
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            return packages;
-        }
+        var cache = new SourceCacheContext();
+        SourceRepository repository = Repository.Factory.GetCoreV3(
+            "https://api.nuget.org/v3/index.json"
+        );
+        PackageMetadataResource resource =
+            repository.GetResourceAsync<PackageMetadataResource>().Result;
 
-        public IVersionInfo Latest(
-            string name,
-            DateTimeOffset asOf,
-            bool includePreReleases)
-        {
-            try
-            {
-                return GetReleaseHistory(name, includePreReleases)
-                    .First(v => asOf >= v.DatePublished);
-            }
-            catch (Exception e)
-            {
-                throw new LatestVersionNotFoundException(name, asOf, e);
-            }
-        }
+        IEnumerable<IPackageSearchMetadata> packages = resource.GetMetadataAsync(
+            name,
+            includePrerelease: true,
+            includeUnlisted: false,
+            cache,
+            logger,
+            cancellationToken).Result;
 
-        public IVersionInfo VersionInfo(string name, string version)
-        {
-            try
-            {
-                return GetReleaseHistory(name, includePreReleaseVersions: true)
-                    .First(v => v.Version == version);
-            }
-            catch (Exception e)
-            {
-                throw new VersionNotFoundException(name, version, e);
-            }
-        }
+        return packages;
+    }
 
-        public List<IVersionInfo> VersionsBetween(
-            string name,
-            DateTimeOffset asOf,
-            IVersionInfo earlierVersion,
-            IVersionInfo laterVersion,
-            bool includePreReleases)
+    public IVersionInfo Latest(
+        string name,
+        DateTimeOffset asOf,
+        bool includePreReleases)
+    {
+        try
         {
             return GetReleaseHistory(name, includePreReleases)
-                .Where(v => asOf >= v.DatePublished)
-                .Where(predicate: v => v.CompareTo(earlierVersion) == 1)
-                .Where(predicate: v => v.CompareTo(laterVersion) == -1)
-                .ToList();
+                .First(v => asOf >= v.DatePublished);
         }
-
-        public IVersionInfo Latest(
-            string name,
-            DateTimeOffset asOf,
-            string thatMatches
-        )
+        catch (Exception e)
         {
-            throw new NotImplementedException();
+            throw new LatestVersionNotFoundException(name, asOf, e);
         }
+    }
+
+    public IVersionInfo VersionInfo(string name, string version)
+    {
+        try
+        {
+            return GetReleaseHistory(name, includePreReleaseVersions: true)
+                .First(v => v.Version == version);
+        }
+        catch (Exception e)
+        {
+            throw new VersionNotFoundException(name, version, e);
+        }
+    }
+
+    public List<IVersionInfo> VersionsBetween(
+        string name,
+        DateTimeOffset asOf,
+        IVersionInfo earlierVersion,
+        IVersionInfo laterVersion,
+        bool includePreReleases)
+    {
+        return GetReleaseHistory(name, includePreReleases)
+            .Where(v => asOf >= v.DatePublished)
+            .Where(predicate: v => v.CompareTo(earlierVersion) == 1)
+            .Where(predicate: v => v.CompareTo(laterVersion) == -1)
+            .ToList();
+    }
+
+    public IVersionInfo Latest(
+        string name,
+        DateTimeOffset asOf,
+        string thatMatches
+    )
+    {
+        throw new NotImplementedException();
     }
 }

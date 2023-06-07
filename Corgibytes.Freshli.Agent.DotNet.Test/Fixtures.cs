@@ -1,22 +1,20 @@
-using System.Collections.Generic;
-using System.IO;
+using System.Reflection;
 
-namespace Corgibytes.Freshli.Lib.Test
+namespace Corgibytes.Freshli.Agent.DotNet.Test;
+
+public static class Fixtures
 {
-    public class Fixtures
+    public static string Path(params string[] values)
     {
-        public static string Path(params string[] values)
+
+        string assemblyPath = Assembly.GetExecutingAssembly().Location;
+        var components = new List<string>()
         {
+            Directory.GetParent(assemblyPath)!.ToString(),
+            "Fixtures"
+        };
+        components.AddRange(values);
 
-            string assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            var components = new List<string>()
-            {
-                Directory.GetParent(assemblyPath)!.ToString(),
-                "Fixtures"
-            };
-            components.AddRange(values);
-
-            return System.IO.Path.Combine(components.ToArray());
-        }
+        return System.IO.Path.Combine(components.ToArray());
     }
 }

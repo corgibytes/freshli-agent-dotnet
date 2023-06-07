@@ -1,9 +1,8 @@
-namespace Corgibytes.Freshli.Agent.DotNet.Lib
-{
-    public interface IFileHistoryFinderRegistry
-    {
-        IList<IFileHistoryFinder> Finders { get; }
+namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
-        void Register<TFinder>() where TFinder : IFileHistoryFinder, new();
-    }
+public interface IFileHistoryFinderRegistry
+{
+    IList<IFileHistoryFinder> Finders { get; }
+
+    void Register<TFinder>() where TFinder : IFileHistoryFinder, new();
 }
