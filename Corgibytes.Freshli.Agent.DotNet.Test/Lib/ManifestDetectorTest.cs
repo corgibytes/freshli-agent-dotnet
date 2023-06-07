@@ -1,5 +1,4 @@
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Lib;
 using Xunit;
 using Xunit.Abstractions;
 
