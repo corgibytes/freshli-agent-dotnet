@@ -26,9 +26,7 @@ public sealed class ReleaseHistoryRetriever
      */
     private static IEnumerable<IPackageSearchMetadata> GetMetadata(string name)
     {
-        ILogger logger = NullLogger.Instance;
         CancellationToken cancellationToken = CancellationToken.None;
-
         var cache = new SourceCacheContext();
         SourceRepository repository = Repository.Factory.GetCoreV3(
             "https://api.nuget.org/v3/index.json"
@@ -39,9 +37,9 @@ public sealed class ReleaseHistoryRetriever
         IEnumerable<IPackageSearchMetadata> packages = resource.GetMetadataAsync(
             name,
             includePrerelease: true,
-            includeUnlisted: false,
+            includeUnlisted: true,
             cache,
-            logger,
+            NullLogger.Instance,
             cancellationToken).Result;
 
         return packages;
