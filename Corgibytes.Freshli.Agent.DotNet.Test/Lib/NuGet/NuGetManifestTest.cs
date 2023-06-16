@@ -33,8 +33,8 @@ public class NuGetManifestTest
         var manifest = new NuGetManifest();
         manifest.Update(xmldoc, "NLog", "5.2.0");
 
-        XmlNode? node = xmldoc.SelectSingleNode("/Project/ItemGroup/PackageReference[@Include = 'NLog']");
+        XmlNode? node = xmldoc.SelectSingleNode($"/Project/ItemGroup/{NuGetManifest.Element}[@{NuGetManifest.NameAttribute} = 'NLog']");
         Assert.NotNull(node);
-        Assert.Equal("5.2.0", node.Attributes["Version"].Value);
+        Assert.Equal("5.2.0", node.Attributes[NuGetManifest.VersionAttribute].Value);
     }
 }

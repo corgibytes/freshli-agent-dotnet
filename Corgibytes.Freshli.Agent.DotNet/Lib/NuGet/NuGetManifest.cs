@@ -4,6 +4,10 @@ namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 
 public class NuGetManifest : AbstractManifest
 {
+    public const string Element = "PackageReference";
+    public const string NameAttribute = "Include";
+    public const string VersionAttribute = "Version";
+
     public override void Parse(string contents)
     {
         var xmlDoc = new XmlDocument();
@@ -13,20 +17,20 @@ public class NuGetManifest : AbstractManifest
 
     public override void Parse(XmlDocument xmlDoc)
     {
-        XmlNodeList packages = xmlDoc.GetElementsByTagName("PackageReference");
+        XmlNodeList packages = xmlDoc.GetElementsByTagName(Element);
         foreach (XmlNode package in packages)
         {
             Add(
-                package.Attributes![0].Value,
-                package.Attributes[1].Value
+                package.Attributes![NameAttribute]!.Value,
+                package.Attributes![VersionAttribute]!.Value
             );
         }
     }
 
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
-        XmlNode? node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/PackageReference[@Include = '{packageName}']");
-        node.Attributes["Version"].Value = packageVersion;
+        XmlNode? node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
+        node.Attributes[VersionAttribute].Value = packageVersion;
     }
 
     public override bool UsesExactMatches => true;

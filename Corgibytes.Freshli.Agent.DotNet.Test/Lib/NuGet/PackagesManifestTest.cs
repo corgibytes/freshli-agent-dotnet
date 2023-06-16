@@ -32,8 +32,8 @@ public class PackagesManifestTest
         var manifest = new PackagesManifest();
         manifest.Update(xmldoc, "NLog", "5.2.0");
 
-        XmlNode? node = xmldoc.SelectSingleNode("*/package[@id = 'NLog']");
+        XmlNode? node = xmldoc.SelectSingleNode($"*/{PackagesManifest.Element}[@{PackagesManifest.NameAttribute} = 'NLog']");
         Assert.NotNull(node);
-        Assert.Equal("5.2.0", node.Attributes["version"].Value);
+        Assert.Equal("5.2.0", node.Attributes[PackagesManifest.VersionAttribute].Value);
     }
 }
