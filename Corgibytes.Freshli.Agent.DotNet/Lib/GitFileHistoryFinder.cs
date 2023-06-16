@@ -59,7 +59,7 @@ public class GitFileHistoryFinder : IFileHistoryFinder
         {
             Repository.Clone(url, tempFolder, options);
         }
-        catch (NotFoundException)
+        catch (Exception exception) when (exception is NotFoundException or LibGit2SharpException)
         {
             result = false;
         }
