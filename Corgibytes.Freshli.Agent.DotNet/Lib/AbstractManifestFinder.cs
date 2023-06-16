@@ -13,4 +13,9 @@ public abstract class AbstractManifestFinder
     {
         return FileFinder?.GetManifestFilenames(projectRootPath, ManifestPattern);
     }
+
+    public bool IsFinderFor(string manifestFile)
+    {
+        return manifestFile.EndsWith(ManifestPattern.Replace("*", ""));
+    }
 }
