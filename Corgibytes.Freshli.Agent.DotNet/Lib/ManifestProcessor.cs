@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
+using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
@@ -14,7 +15,7 @@ public partial class ManifestProcessor
         _logger.LogDebug("Processing manifest at {ManifestFilePath} as of {AsOfDate}", manifestFilePath, asOfDate);
         if (asOfDate != null)
         {
-            // do nothing at the moment.
+            Versions.UpdateManifest(manifestFilePath, asOfDate.Value);
         }
 
         var manifestDir = new DirectoryInfo(manifestFilePath);
@@ -65,6 +66,11 @@ public partial class ManifestProcessor
 
         string output = proc.StandardOutput.ReadToEnd();
         proc.WaitForExit();
+
+        if (asOfDate != null)
+        {
+            Versions.RestoreManifest(manifestFilePath);
+        }
 
         if (proc.ExitCode != 0)
         {
