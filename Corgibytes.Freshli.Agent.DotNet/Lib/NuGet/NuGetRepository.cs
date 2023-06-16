@@ -10,7 +10,7 @@ public class NuGetRepository : IPackageRepository
     private readonly IDictionary<string, IEnumerable<NuGetVersionInfo>> _packages
         = new Dictionary<string, IEnumerable<NuGetVersionInfo>>();
 
-    private IEnumerable<IVersionInfo> GetReleaseHistory(
+    public IEnumerable<IVersionInfo> GetReleaseHistory(
         string name,
         bool includePreReleaseVersions
     )
@@ -20,7 +20,7 @@ public class NuGetRepository : IPackageRepository
             return history;
         }
 
-        IEnumerable<IPackageSearchMetadata> versions = GetMetadata(name);
+        IEnumerable<IPackageSearchMetadata> versions = GetMetadata(name, includePreReleaseVersions);
         _packages[name] = versions
             .OrderByDescending(nv => nv.Published)
             .Select(v => new NuGetVersionInfo(
@@ -31,7 +31,7 @@ public class NuGetRepository : IPackageRepository
         return _packages[name];
     }
 
-    private IEnumerable<IPackageSearchMetadata> GetMetadata(string name)
+    private IEnumerable<IPackageSearchMetadata> GetMetadata(string name, bool includePreReleaseVersions)
     {
         ILogger logger = NullLogger.Instance;
         CancellationToken cancellationToken = CancellationToken.None;
@@ -45,7 +45,7 @@ public class NuGetRepository : IPackageRepository
 
         IEnumerable<IPackageSearchMetadata> packages = resource.GetMetadataAsync(
             name,
-            includePrerelease: true,
+            includePrerelease: includePreReleaseVersions,
             includeUnlisted: false,
             cache,
             logger,

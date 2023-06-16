@@ -18,4 +18,10 @@ public interface IPackageRepository
         IVersionInfo laterVersion,
         bool includePreReleases
     );
+
+    public IEnumerable<IVersionInfo> GetReleaseHistory(
+        string name,
+        bool includePreReleaseVersions
+    );
+
 }
