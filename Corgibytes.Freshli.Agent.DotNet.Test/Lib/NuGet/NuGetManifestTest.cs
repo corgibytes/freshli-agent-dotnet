@@ -1,3 +1,4 @@
+using System.Xml;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Xunit;
 
@@ -5,11 +6,7 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet;
 
 public class NuGetManifestTest
 {
-    [Fact]
-    public void ParsesFile()
-    {
-        var manifest = new NuGetManifest();
-        string testContent = @"<Project Sdk=""Microsoft.NET.Sdk"">
+    private const string TestContent = @"<Project Sdk=""Microsoft.NET.Sdk"">
             <ItemGroup>
             <PackageReference Include=""DotNetEnv"" Version=""1.4.0"" />
             <PackageReference Include=""Elasticsearch.Net"" Version=""7.10"" />
@@ -20,8 +17,24 @@ public class NuGetManifestTest
             </ItemGroup>
         </Project>";
 
-        manifest.Parse(testContent);
-
+    [Fact]
+    public void ParsesFile()
+    {
+        var manifest = new NuGetManifest();
+        manifest.Parse(TestContent);
         Assert.Equal(6, manifest.Count);
+    }
+
+    [Fact]
+    public void Update()
+    {
+        var xmldoc = new XmlDocument();
+        xmldoc.LoadXml(TestContent);
+        var manifest = new NuGetManifest();
+        manifest.Update(xmldoc, "NLog", "5.2.0");
+
+        XmlNode? node = xmldoc.SelectSingleNode("/Project/ItemGroup/PackageReference[@Include = 'NLog']");
+        Assert.NotNull(node);
+        Assert.Equal("5.2.0", node.Attributes["Version"].Value);
     }
 }

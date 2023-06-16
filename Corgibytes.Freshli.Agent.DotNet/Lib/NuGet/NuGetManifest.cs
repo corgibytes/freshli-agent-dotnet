@@ -8,7 +8,11 @@ public class NuGetManifest : AbstractManifest
     {
         var xmlDoc = new XmlDocument();
         xmlDoc.LoadXml(contents);
+        Parse(xmlDoc);
+    }
 
+    public override void Parse(XmlDocument xmlDoc)
+    {
         XmlNodeList packages = xmlDoc.GetElementsByTagName("PackageReference");
         foreach (XmlNode package in packages)
         {
@@ -17,6 +21,12 @@ public class NuGetManifest : AbstractManifest
                 package.Attributes[1].Value
             );
         }
+    }
+
+    public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
+    {
+        XmlNode? node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/PackageReference[@Include = '{packageName}']");
+        node.Attributes["Version"].Value = packageVersion;
     }
 
     public override bool UsesExactMatches => true;

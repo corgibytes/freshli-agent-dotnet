@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Xml;
 using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
@@ -41,5 +42,9 @@ public abstract class AbstractManifest : IManifest
     }
 
     public abstract void Parse(string contents);
+    public abstract void Parse(XmlDocument xmlDoc);
+
+    public abstract void Update(XmlDocument xmlDoc, string packageName, string packageVersion);
+
     public PackageInfo this[string packageName] => _packages[packageName];
 }
