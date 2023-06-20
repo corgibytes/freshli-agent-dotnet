@@ -12,6 +12,6 @@ public class MainCommand : RootCommand
         Add(new ValidatingRepositories());
         Add(new DetectManifests());
         Add(new ProcessManifest());
-        Add( new StartServer());
+        Add(new StartServer());
     }
 }
