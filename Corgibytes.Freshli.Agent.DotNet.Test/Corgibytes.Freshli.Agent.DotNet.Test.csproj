@@ -26,15 +26,14 @@
     <None Update="Fixtures\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Fixtures\config\Opserver.Core\packages.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Fixtures\csproj\Project.csproj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="obj\" />
   </ItemGroup>
 
   <Target Name="CleanFixtureDir" AfterTargets="Clean">

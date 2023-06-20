@@ -6,6 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
+public enum CycloneDxExitCode
+{
+    Ok,
+    OkFail,
+    IOError
+}
+
 public partial class ManifestProcessor
 {
     private readonly ILogger<ManifestProcessor> _logger = Logging.Logger<ManifestProcessor>();
@@ -72,12 +79,25 @@ public partial class ManifestProcessor
             Versions.RestoreManifest(manifestFilePath);
         }
 
-        if (proc.ExitCode != 0)
+        if (proc.ExitCode != (int)CycloneDxExitCode.Ok)
         {
-            throw new ManifestProcessingException(
-                $"CycloneDX execution failed with exitCode = {proc.ExitCode}");
-        }
+            string errorMessage = proc.StandardError.ReadToEnd();
+            _logger.LogError("Error running CycloneDX: {ErrorMessage}", errorMessage);
 
+            if (proc.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
+            {
+                throw new ManifestProcessingException(
+                    $"CycloneDX execution failed with exitCode = {proc.ExitCode}",
+                    errorMessage);
+            }
+
+            return "";
+        }
+        // The CycloneDX cli tool will exit with different error codes
+        // to
+        // indicate the problem. The agent needs to absorb most of them,
+        // notify the caller of problems, but not cause errors that
+        // can not be dealt with properly
         if (File.Exists(outFile))
         {
             return outFile;

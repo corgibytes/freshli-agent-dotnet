@@ -38,7 +38,6 @@ public class ManifestDetectorTest
             _output.WriteLine($"ManifestFinder: {manifestFile}");
         }
 
-
-        Assert.Equal(2, manifests.Count());
+        Assert.Equal(3, manifests.Count());
     }
 }

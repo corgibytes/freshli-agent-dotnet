@@ -25,6 +25,7 @@ public class ManifestProcessorTest
         Assert.Equal(7, json?.Count);
         JsonElement components = json!["components"];
         Assert.Equal(79, components.GetArrayLength());
+        File.Delete(expectedBomFilePath);
     }
 
     [Fact]
@@ -45,7 +46,16 @@ public class ManifestProcessorTest
         Assert.Equal(7, json?.Count);
         JsonElement components = json!["components"];
         Assert.Equal(4, components.GetArrayLength());
+        File.Delete(expectedBomFilePath);
+    }
 
+    [Fact]
+    public void ProcessOpserverManifest()
+    {
+        string path = Fixtures.Path("config", "Opserver.Core", "packages.config");
+        var asOfDate = DateTimeOffset.Parse("2015-05-01T00:00:00.0000Z");
+        string bomPath = _manifestProcessor.ProcessManifest(path, asOfDate);
+        Assert.Empty(bomPath);
     }
 
     [Fact]
