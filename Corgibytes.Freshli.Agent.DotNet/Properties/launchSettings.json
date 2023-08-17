@@ -1,0 +1,14 @@
+﻿{
+  "profiles": {
+    "AgentServer": {
+      "commandName": "Project",
+      "commandLineArgs": "start-server",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5155",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
