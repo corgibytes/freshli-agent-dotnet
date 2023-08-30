@@ -54,6 +54,6 @@ public class ManifestDetector
             manifests.AddRange(finder.GetManifestFilenames(analysisPath));
         }
 
-        return manifests;
+        return manifests.Order();
     }
 }
