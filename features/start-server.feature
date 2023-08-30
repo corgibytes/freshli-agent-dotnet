@@ -1,10 +1,11 @@
 Feature: `start-server` command
 
   The `start-server` starts a gRPC server as described in `freshli_agent.proto`. After the server
-  is started, the process blocks until either the process is terminated or the `Shutdown` RPC
+  is started, the process blocks until either the process is terminated or the `Shutdown` gRPC
   function is called. Once the gRPC server is ready for connections, then a message is written
-  to the console. If the specified port is not available, then the process terminates immediately
-  with a non-zero exit code after outputting an error message.
+  to the console, and the health check service will indicate that the service is healthy. If the
+  specified port is not available, then the process terminates immediately with a non-zero exit
+  code after outputting an error message.
 
   Scenario: Starting the server with a provided port number
     Given there are no services running on port 8324
