@@ -31,6 +31,12 @@
       "commands": [
         "dotnet-gitreleasemanager"
       ]
+    },
+    "cyclonedx": {
+      "version": "2.7.0",
+      "commands": [
+        "dotnet-CycloneDX"
+      ]
     }
   }
 }
