@@ -8,11 +8,13 @@ namespace Corgibytes.Freshli.Agent.DotNet.Services;
 
 public class AgentService : Agent.AgentBase
 {
+    private readonly AgentServer _server;
     private readonly ILogger<AgentService> _logger;
     private readonly ManifestProcessor _manifestProcessor;
 
-    public AgentService(ILogger<AgentService> logger)
+    public AgentService(AgentServer server, ILogger<AgentService> logger)
     {
+        _server = server;
         _logger = logger;
         _manifestProcessor = new ManifestProcessor();
     }
@@ -76,7 +78,7 @@ public class AgentService : Agent.AgentBase
     public override Task<Empty> Shutdown(Empty request, ServerCallContext context)
     {
         _logger.LogInformation("Shutdown()");
-        AgentServer.Instance()!.Stop();
+        _server.Stop();
         return Task.FromResult(new Empty());
     }
 

@@ -11,8 +11,6 @@ namespace Corgibytes.Freshli.Agent.DotNet.Services;
 
 public class AgentServer
 {
-    private static AgentServer? s_instance;
-
     // ReSharper disable all
     public int Port { get; set; }
 
@@ -54,19 +52,21 @@ public class AgentServer
 
         builder.Services.AddGrpcReflection();
 
+        builder.Services.AddSingleton(this);
+
         _application = builder.Build();
         _application.MapGrpcService<AgentService>();
         _application.MapGrpcHealthChecksService();
         _application.MapGrpcReflectionService();
 
         _application.Run($"http://0.0.0.0:{Port}");
-        s_instance = this;
     }
 
     public void Stop()
     {
-        Task.Run(async () => { await _application!.DisposeAsync(); });
+        Task.Run(async () =>
+        {
+            await _application!.StopAsync();
+        });
     }
-
-    public static AgentServer? Instance() => s_instance;
 }

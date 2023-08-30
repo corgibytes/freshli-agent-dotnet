@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using Corgibytes.Freshli.Agent.DotNet.Services;
+using Microsoft.AspNetCore.Connections;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Commands;
 
@@ -17,9 +18,24 @@ public class StartServer : Command
         Handler = CommandHandler.Create<int>(Run);
     }
 
-    private void Run(int port)
+    private int Run(int port)
     {
         var server = new AgentServer(port);
-        server.Start();
+        try
+        {
+            server.Start();
+        }
+        catch (IOException error)
+        {
+            if (error.InnerException is AddressInUseException)
+            {
+                Console.WriteLine($"Unable to start the gRPC service. Port {port} is in use.");
+                return -1;
+            }
+
+            throw;
+        }
+
+        return 0;
     }
 }
