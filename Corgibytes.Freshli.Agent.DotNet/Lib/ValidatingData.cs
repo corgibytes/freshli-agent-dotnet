@@ -12,5 +12,7 @@ public static class ValidatingData
     public static List<string> RepositoryUrls() => new()
     {
         "https://github.com/corgibytes/freshli-fixture-csharp-test",
+        "https://github.com/jellyfin/jellyfin",
+        "https://github.com/reactiveui/Akavache"
     };
 }
