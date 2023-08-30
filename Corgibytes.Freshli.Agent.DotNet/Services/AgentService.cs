@@ -60,9 +60,9 @@ public class AgentService : Agent.AgentBase
     public override Task RetrieveReleaseHistory(Package request, IServerStreamWriter<PackageRelease> responseStream,
         ServerCallContext context)
     {
-        string packageUrl = request.Purl;
+        var packageUrl = request.Purl;
         _logger.LogInformation("RetrieveReleaseHistory() - {RequestPurl}", packageUrl);
-        List<PackageReleaseData> packageReleases = new ReleaseHistoryRetriever().Retrieve(packageUrl);
+        var packageReleases = new ReleaseHistoryRetriever().Retrieve(packageUrl);
         packageReleases
             .ForEach(release =>
             {
