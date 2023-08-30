@@ -36,19 +36,26 @@ public class AgentServer
             });
         });
 
+        builder.Services.Configure<HealthCheckPublisherOptions>(options =>
+        {
+            options.Delay = TimeSpan.Zero;
+            options.Period = TimeSpan.FromSeconds(10);
+        });
+
         builder.Logging.ClearProviders().AddConsole();
 
         builder.Services.AddGrpc(configure => configure.EnableDetailedErrors = true);
-        builder.Services.AddGrpcHealthChecks()
-            .AddCheck("Agent", () => HealthCheckResult.Healthy());
+        builder.Services.AddGrpcHealthChecks(configure =>
+        {
+            configure.Services.MapService("", result => true);
+            configure.Services.MapService("com.corgibytes.freshli.agent.Agent", result => true);
+        })
+            .AddCheck("com.corgibytes.freshli.agent.Agent", () => HealthCheckResult.Healthy());
+
         builder.Services.AddGrpcReflection();
 
         _application = builder.Build();
         _application.MapGrpcService<AgentService>();
-        _application.MapGet("/",
-            () =>
-                "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909"
-        );
         _application.MapGrpcHealthChecksService();
         _application.MapGrpcReflectionService();
 
