@@ -101,8 +101,8 @@ jobs:
 
       - name: "[Build]"
         run: |
-          bundle exec ruby bin/build.rb
+          ruby bin/build.rb
 
       - name: "[Test]"
         run: |
-          bundle exec ruby bin/test.rb
+          ruby bin/test.rb
