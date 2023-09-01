@@ -67,6 +67,11 @@ jobs:
           mv cyclonedx-linux-x64 cyclonedx
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
 
+      - name: "[Setup] - Install CycloneDX dotnet as a global tool"
+        run: |
+          dotnet tool install --global CycloneDX
+          echo "$GITHUB_WORKSPACE/.dotnet/tools" >> $GITHUB_PATH
+
       - name: "[Setup] - Set HOME env variable (Windows)"
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
