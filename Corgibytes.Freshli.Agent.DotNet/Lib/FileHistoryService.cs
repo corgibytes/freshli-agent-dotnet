@@ -14,8 +14,9 @@ public class FileHistoryService
 
     public IFileHistoryFinder SelectFinderFor(string projectRootPath)
     {
-        foreach (var finder in _registry.Finders.ToImmutableList()
-                     .Where(finder => finder.DoesPathContainHistorySource(projectRootPath)))
+        var matchingFinders = _registry.Finders.ToImmutableList()
+            .Where(finder => finder.DoesPathContainHistorySource(projectRootPath));
+        foreach (var finder in matchingFinders)
         {
             return finder;
         }
