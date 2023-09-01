@@ -45,6 +45,28 @@ jobs:
         with:
           versionSpec: '5.10.3'
 
+      - name: "[Setup] - Install Ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: "[Setup] - Install CycloneDX CLI (Windows)"
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cd bin
+          Invoke-WebRequest -Uri https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.0/cyclonedx-win-x64.exe -OutFile cyclonedx.exe
+          "$env:GITHUB_WORKSPACE\bin" >> $env:GITHUB_PATH
+
+      - name: "[Setup] - Install CycloneDX CLI (Linux)"
+        if: runner.os != 'Windows'
+        run: |
+          cd bin
+          curl -LO https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.0/cyclonedx-linux-x64
+          chmod a+x cyclonedx-linux-x64
+          mv cyclonedx-linux-x64 cyclonedx
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
       - name: "[Setup] - Set HOME env variable (Windows)"
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
