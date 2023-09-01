@@ -39,6 +39,7 @@ GEM
     cucumber-tag-expressions (4.1.0)
     diff-lcs (1.5.0)
     ffi (1.15.5)
+    ffi (1.15.5-x64-mingw32)
     freshli-commons (0.6.4)
       aruba (~> 2.1.0)
       grpc
@@ -46,10 +47,14 @@ GEM
       rspec-expectations
       sqlite3
     google-protobuf (3.24.2-arm64-darwin)
+    google-protobuf (3.24.2-x64-mingw32)
     google-protobuf (3.24.2-x86_64-linux)
     googleapis-common-protos-types (1.8.0)
       google-protobuf (~> 3.18)
     grpc (1.57.0)
+      google-protobuf (~> 3.23)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.57.0-x64-mingw32)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
     grpc (1.57.0-x86_64-linux)
@@ -93,6 +98,7 @@ GEM
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     sqlite3 (1.6.4-arm64-darwin)
+    sqlite3 (1.6.4-x64-mingw32)
     sqlite3 (1.6.4-x86_64-linux)
     sys-uname (1.2.3)
       ffi (~> 1.1)
@@ -101,6 +107,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-22
+  x64-mingw32
   x86_64-linux
 
 DEPENDENCIES
