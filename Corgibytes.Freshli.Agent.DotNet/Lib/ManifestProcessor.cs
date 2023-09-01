@@ -1,5 +1,9 @@
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+
+using CliWrap;
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Microsoft.Extensions.Logging;
@@ -19,6 +23,11 @@ public partial class ManifestProcessor
 
     public string ProcessManifest(string manifestFilePath, DateTimeOffset? asOfDate)
     {
+        if (!File.Exists(manifestFilePath))
+        {
+            throw new FileNotFoundException("Manifest file was not found", manifestFilePath);
+        }
+
         _logger.LogDebug("Processing manifest at {ManifestFilePath} as of {AsOfDate}", manifestFilePath, asOfDate);
         if (asOfDate != null)
         {
@@ -57,38 +66,40 @@ public partial class ManifestProcessor
                 Path.Combine(outDir, destFileName));
         }
 
-        // use -dgl for now to avoid hitting Github rate limit
-        ProcessStartInfo startInfo = new()
-        {
-            FileName = "/usr/local/bin/cyclonedx",
-            Arguments = $"{manifestFilePath} -dgl -j -o {outDir}",
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            WorkingDirectory = manifestDir.FullName
-        };
-        var proc = Process.Start(startInfo);
+        var commandResult = Cli.Wrap("dotnet-CycloneDX")
+            .WithArguments(new List<string>
+            {
+                manifestFilePath,
+                "--disable-github-licenses",
+                "--json",
+                "--out",
+                outDir
+            })
+            .WithWorkingDirectory(manifestDir.FullName)
+            .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
+            .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
+            .WithValidation(CommandResultValidation.None)
+            // TODO: Pass in a cancellation token that will get triggered if Shutdown is called
+            .ExecuteAsync()
+            .Task
+            .Result;
 
-        ArgumentNullException.ThrowIfNull(proc);
-
-        string output = proc.StandardOutput.ReadToEnd();
-        proc.WaitForExit();
+        FixBomLicenseNodes(Path.Combine(outDir, "bom.json"));
 
         if (asOfDate != null)
         {
             Versions.RestoreManifest(manifestFilePath);
         }
 
-        if (proc.ExitCode != (int)CycloneDxExitCode.Ok)
+        if (commandResult.ExitCode != (int)CycloneDxExitCode.Ok)
         {
-            string errorMessage = proc.StandardError.ReadToEnd();
-            _logger.LogError("Error running CycloneDX: {ErrorMessage}", errorMessage);
+            _logger.LogError("Error running CycloneDX");
 
-            if (proc.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
+            if (commandResult.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
             {
                 throw new ManifestProcessingException(
-                    $"CycloneDX execution failed with exitCode = {proc.ExitCode}",
-                    errorMessage);
+                    $"CycloneDX execution failed with exitCode = {commandResult.ExitCode}"
+                );
             }
 
             return "";
@@ -103,21 +114,87 @@ public partial class ManifestProcessor
             return outFile;
         }
 
-        return ExtractFile(output);
+        throw new ManifestProcessingException("Failed to generate bill of materials.");
     }
 
-    [GeneratedRegex(".*Writing to:(.*)$", RegexOptions.IgnoreCase, "en-US")]
-    private static partial Regex FilenameFinderRegex();
-
-    public static string ExtractFile(string content)
+    private void FixBomLicenseNodes(string bomPath)
     {
-        Match match = FilenameFinderRegex().Match(content);
-        if (match is { Success: true, Groups.Count: > 0 })
+        using var bomStream = new FileStream(bomPath, FileMode.Open, FileAccess.ReadWrite);
+        var bomRoot = JsonNode.Parse(bomStream)!;
+
+        FixBomLicenseNodes(bomRoot);
+        var bomContents = bomRoot.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+
+        bomStream.Seek(0, SeekOrigin.Begin);
+        using var bomWriter = new StreamWriter(bomStream);
+        bomWriter.Write(bomContents);
+        bomWriter.Close();
+    }
+
+    private void FixBomLicenseNodes(JsonNode node)
+    {
+        switch (node)
         {
-            return match.Groups[1].ToString().Trim();
+            case JsonObject objectNode:
+                HandleJsonObject(objectNode);
+                break;
+
+            case JsonArray arrayNode:
+                HandleJsonArray(arrayNode);
+                break;
+        }
+    }
+
+    private void HandleJsonArray(JsonArray arrayNode)
+    {
+        foreach (var childNode in arrayNode)
+        {
+            if (childNode != null)
+            {
+                FixBomLicenseNodes(childNode);
+            }
+        }
+    }
+
+    private void HandleJsonObject(JsonObject objectNode)
+    {
+        if (HandleLicenseArray(objectNode))
+        {
+            return;
         }
 
-        throw new ManifestProcessingException(
-            "Failed to generate bill of materials.", content);
+        foreach (var childEntry in objectNode)
+        {
+            if (childEntry.Value != null)
+            {
+                FixBomLicenseNodes(childEntry.Value);
+            }
+        }
+    }
+
+    private static bool HandleLicenseArray(JsonObject objectNode)
+    {
+        if (!objectNode.ContainsKey("licenses") || objectNode["licenses"] is not JsonArray licensesArray)
+        {
+            return false;
+        }
+
+        foreach (var licenseChoiceNode in licensesArray)
+        {
+            if (licenseChoiceNode is not JsonObject objectLicenseChoiceNode ||
+                !((IDictionary<string, JsonNode?>)objectLicenseChoiceNode).TryGetValue("license", out var licenseNode))
+            {
+                continue;
+            }
+
+            if (licenseNode is JsonObject objectLicenseNode &&
+                objectLicenseNode.ContainsKey("url") &&
+                !objectLicenseNode.ContainsKey("name"))
+            {
+                objectLicenseNode["name"] = "Unknown - See URL";
+            }
+        }
+
+        return true;
     }
 }

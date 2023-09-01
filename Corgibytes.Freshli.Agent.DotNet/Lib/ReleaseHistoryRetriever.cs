@@ -9,14 +9,21 @@ public sealed class ReleaseHistoryRetriever
 
     public List<PackageReleaseData> Retrieve(string packageUrl)
     {
-        var purl = new PackageURL(packageUrl);
+        try
+        {
+            var purl = new PackageURL(packageUrl);
 
-        IEnumerable<IVersionInfo> releaseHistory = _nuGetRepository.GetReleaseHistory(purl.Name, true);
-        var results = releaseHistory.Select(release =>
-            new PackageReleaseData(
-                release.Version,
-                release.DatePublished.DateTime.ToUniversalTime())
-        ).ToList();
-        return results;
+            var releaseHistory = _nuGetRepository.GetReleaseHistory(purl.Name, true);
+            var results = releaseHistory.Select(release =>
+                new PackageReleaseData(
+                    release.Version,
+                    release.DatePublished)
+            ).OrderBy(value => value.ReleasedAt).ToList();
+            return results;
+        }
+        catch (MalformedPackageUrlException)
+        {
+            return new List<PackageReleaseData>();
+        }
     }
 }
