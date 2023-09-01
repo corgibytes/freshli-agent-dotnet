@@ -23,6 +23,11 @@ public partial class ManifestProcessor
 
     public string ProcessManifest(string manifestFilePath, DateTimeOffset? asOfDate)
     {
+        if (!File.Exists(manifestFilePath))
+        {
+            throw new FileNotFoundException("Manifest file was not found", manifestFilePath);
+        }
+
         _logger.LogDebug("Processing manifest at {ManifestFilePath} as of {AsOfDate}", manifestFilePath, asOfDate);
         if (asOfDate != null)
         {
