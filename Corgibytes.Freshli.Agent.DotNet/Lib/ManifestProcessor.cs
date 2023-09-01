@@ -1,5 +1,9 @@
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+
+using CliWrap;
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Microsoft.Extensions.Logging;
@@ -57,38 +61,38 @@ public partial class ManifestProcessor
                 Path.Combine(outDir, destFileName));
         }
 
-        // use -dgl for now to avoid hitting Github rate limit
-        ProcessStartInfo startInfo = new()
-        {
-            FileName = "/usr/local/bin/cyclonedx",
-            Arguments = $"{manifestFilePath} -dgl -j -o {outDir}",
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            WorkingDirectory = manifestDir.FullName
-        };
-        var proc = Process.Start(startInfo);
-
-        ArgumentNullException.ThrowIfNull(proc);
-
-        string output = proc.StandardOutput.ReadToEnd();
-        proc.WaitForExit();
+        var commandResult = Cli.Wrap("dotnet-CycloneDX")
+            .WithArguments(new List<string>
+            {
+                manifestFilePath,
+                "--disable-github-licenses",
+                "--json",
+                "--out",
+                outDir
+            })
+            .WithWorkingDirectory(manifestDir.FullName)
+            .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
+            .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
+            .WithValidation(CommandResultValidation.None)
+            // TODO: Pass in a cancellation token that will get triggered if Shutdown is called
+            .ExecuteAsync()
+            .Task
+            .Result;
 
         if (asOfDate != null)
         {
             Versions.RestoreManifest(manifestFilePath);
         }
 
-        if (proc.ExitCode != (int)CycloneDxExitCode.Ok)
+        if (commandResult.ExitCode != (int)CycloneDxExitCode.Ok)
         {
-            string errorMessage = proc.StandardError.ReadToEnd();
-            _logger.LogError("Error running CycloneDX: {ErrorMessage}", errorMessage);
+            _logger.LogError("Error running CycloneDX");
 
-            if (proc.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
+            if (commandResult.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
             {
                 throw new ManifestProcessingException(
-                    $"CycloneDX execution failed with exitCode = {proc.ExitCode}",
-                    errorMessage);
+                    $"CycloneDX execution failed with exitCode = {commandResult.ExitCode}"
+                );
             }
 
             return "";
@@ -103,21 +107,7 @@ public partial class ManifestProcessor
             return outFile;
         }
 
-        return ExtractFile(output);
+        throw new ManifestProcessingException("Failed to generate bill of materials.");
     }
 
-    [GeneratedRegex(".*Writing to:(.*)$", RegexOptions.IgnoreCase, "en-US")]
-    private static partial Regex FilenameFinderRegex();
-
-    public static string ExtractFile(string content)
-    {
-        Match match = FilenameFinderRegex().Match(content);
-        if (match is { Success: true, Groups.Count: > 0 })
-        {
-            return match.Groups[1].ToString().Trim();
-        }
-
-        throw new ManifestProcessingException(
-            "Failed to generate bill of materials.", content);
-    }
 }
