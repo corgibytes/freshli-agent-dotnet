@@ -33,7 +33,18 @@ public class PackagesManifest : AbstractManifest
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
         var node = xmlDoc.SelectSingleNode($"*/{Element}[@{NameAttribute} = '{packageName}']");
-        node.Attributes[VersionAttribute].Value = packageVersion;
+        if (node != null)
+        {
+            var attributes = node.Attributes;
+            if (attributes != null)
+            {
+                var versionAttribute = attributes[VersionAttribute];
+                if (versionAttribute != null)
+                {
+                    versionAttribute.Value = packageVersion;
+                }
+            }
+        }
     }
 
     public override bool UsesExactMatches => true;
