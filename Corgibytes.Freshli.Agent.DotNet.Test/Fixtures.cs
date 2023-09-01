@@ -7,7 +7,7 @@ public static class Fixtures
     public static string Path(params string[] values)
     {
 
-        string assemblyPath = Assembly.GetExecutingAssembly().Location;
+        var assemblyPath = Assembly.GetExecutingAssembly().Location;
         var components = new List<string>()
         {
             Directory.GetParent(assemblyPath)!.ToString(),

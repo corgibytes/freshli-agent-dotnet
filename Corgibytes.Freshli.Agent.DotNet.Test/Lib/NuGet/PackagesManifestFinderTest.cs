@@ -11,14 +11,14 @@ public class PackagesManifestFinderTest
     [Fact]
     public void IsPackagesFinder()
     {
-        string path = Fixtures.Path("config", "packages.config");
+        var path = Fixtures.Path("config", "packages.config");
         Assert.True(_manifestFinder.IsFinderFor(path));
     }
 
     [Fact]
     public void IsNotPackagesFinder()
     {
-        string path = Fixtures.Path("csproj", "Project.csproj");
+        var path = Fixtures.Path("csproj", "Project.csproj");
         Assert.False(_manifestFinder.IsFinderFor(path));
     }
 }

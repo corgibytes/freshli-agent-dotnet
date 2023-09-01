@@ -8,9 +8,9 @@ public class ProgramTest
     [Fact]
     public void DetectManifests()
     {
-        string path = "./../../../";
-        string command = "detect-manifests";
-        int exitCode = Program.Main(command, path);
+        var path = "./../../../";
+        var command = "detect-manifests";
+        var exitCode = Program.Main(command, path);
         Assert.Equal(0, exitCode);
     }
 }

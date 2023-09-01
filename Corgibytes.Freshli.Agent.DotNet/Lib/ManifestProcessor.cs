@@ -40,7 +40,7 @@ public partial class ManifestProcessor
             manifestDir = manifestDir.Parent;
         }
 
-        string outDir = manifestDir.FullName + "/obj";
+        var outDir = manifestDir.FullName + "/obj";
         if (!Directory.Exists(outDir))
         {
             _logger.LogDebug("Output directory {Dir} needs to be created", outDir);
@@ -54,12 +54,12 @@ public partial class ManifestProcessor
             }
         }
 
-        string outFile = Path.Combine(outDir, "bom.json");
+        var outFile = Path.Combine(outDir, "bom.json");
         if (File.Exists(outFile))
         {
             var existingOutFile = new FileInfo(outFile);
-            string formattedCreationTime = existingOutFile.CreationTime.ToString("yyyyMMdd-HHmmss");
-            string destFileName = $"bom-{formattedCreationTime}.json";
+            var formattedCreationTime = existingOutFile.CreationTime.ToString("yyyyMMdd-HHmmss");
+            var destFileName = $"bom-{formattedCreationTime}.json";
             _logger.LogDebug("Output file {OutFilename} exists and will be moved to {NewOutFilename}", outFile,
                 destFileName);
             File.Move(existingOutFile.FullName,

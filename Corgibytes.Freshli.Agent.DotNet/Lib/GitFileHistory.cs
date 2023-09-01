@@ -12,7 +12,7 @@ public class GitFileHistory : IFileHistory
         // TODO: Move this logic out of the constructor to support async/await.
         if (!Directory.Exists(repositoryPath))
         {
-            string uniqueTempDir = Path.GetFullPath(
+            var uniqueTempDir = Path.GetFullPath(
                 Path.Combine(
                     Path.GetTempPath(),
                     Guid.NewGuid().ToString()
@@ -23,16 +23,16 @@ public class GitFileHistory : IFileHistory
         }
 
         using var repository = new Repository(repositoryPath);
-        IEnumerable<Commit> logEntries =
+        var logEntries =
             repository.Commits.QueryBy(
                 new CommitFilter { SortBy = CommitSortStrategies.Topological }
             ).Where(c => GetTreeEntry(c, targetFile) != null);
 
-        foreach (Commit logEntry in logEntries)
+        foreach (var logEntry in logEntries)
         {
             var blob = GetTreeEntry(logEntry, targetFile).Target as Blob;
-            string? contents = blob!.GetContentText();
-            DateTimeOffset date = logEntry.Committer.When;
+            var contents = blob!.GetContentText();
+            var date = logEntry.Committer.When;
             _historyByDate[date] =
                 new FileHistory(date, logEntry.Sha, contents);
         }
@@ -90,7 +90,7 @@ public class GitFileHistory : IFileHistory
     // This will get the TreeEntry regardless of the location in the Git repo
     // This will need to recursively go through each directory and see if
     // the file exists
-    private TreeEntry GetTreeEntry(Commit commit, string targetFileName)
+    private static TreeEntry GetTreeEntry(Commit commit, string targetFileName)
     {
         return commit.Tree[targetFileName];
     }

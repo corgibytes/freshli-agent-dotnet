@@ -13,14 +13,14 @@ public class GitFileHistoryFinder : IFileHistoryFinder
             return projectRootPath;
         }
 
-        if (_cloneLocations.TryGetValue(projectRootPath, out string? location))
+        if (_cloneLocations.TryGetValue(projectRootPath, out var location))
         {
             return location;
         }
 
         if (IsCloneable(projectRootPath))
         {
-            string cloneLocation = GenerateTempCloneLocation();
+            var cloneLocation = GenerateTempCloneLocation();
             Repository.Clone(projectRootPath, cloneLocation);
             _cloneLocations[projectRootPath] = cloneLocation;
             return cloneLocation;
@@ -31,7 +31,7 @@ public class GitFileHistoryFinder : IFileHistoryFinder
 
     public bool DoesPathContainHistorySource(string projectRootPath)
     {
-        bool result = Repository.IsValid(projectRootPath);
+        var result = Repository.IsValid(projectRootPath);
         if (!result)
         {
             result = IsCloneable(projectRootPath);
@@ -40,7 +40,7 @@ public class GitFileHistoryFinder : IFileHistoryFinder
         return result;
     }
 
-    private string GenerateTempCloneLocation()
+    private static string GenerateTempCloneLocation()
     {
         return Path.Combine(
             Path.GetTempPath(),
@@ -48,12 +48,12 @@ public class GitFileHistoryFinder : IFileHistoryFinder
         );
     }
 
-    private bool IsCloneable(string url)
+    private static bool IsCloneable(string url)
     {
-        bool result = true;
+        var result = true;
         var options = new CloneOptions { Checkout = false };
 
-        string tempFolder = GenerateTempCloneLocation();
+        var tempFolder = GenerateTempCloneLocation();
 
         try
         {
@@ -82,13 +82,13 @@ public class GitFileHistoryFinder : IFileHistoryFinder
 
     public bool Exists(string projectRootPath, string filePath)
     {
-        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        var clonedProjectRoot = NormalizeLocation(projectRootPath);
         return Directory.GetFiles(clonedProjectRoot, filePath).Any();
     }
 
     public string ReadAllText(string projectRootPath, string filePath)
     {
-        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        var clonedProjectRoot = NormalizeLocation(projectRootPath);
         return File.ReadAllText(Path.Combine(clonedProjectRoot, filePath));
     }
 
@@ -97,7 +97,7 @@ public class GitFileHistoryFinder : IFileHistoryFinder
         string pattern
     )
     {
-        string clonedProjectRoot = NormalizeLocation(projectRootPath);
+        var clonedProjectRoot = NormalizeLocation(projectRootPath);
         return Directory.GetFiles(clonedProjectRoot,
                 pattern,
                 SearchOption.AllDirectories)

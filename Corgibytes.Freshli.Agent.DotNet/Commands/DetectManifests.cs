@@ -20,8 +20,8 @@ public class DetectManifests : Command
 
     public void Run(DirectoryInfo path)
     {
-        string analysisPath = path.FullName;
-        foreach (string? manifestFile in ManifestDetector.FindManifests(analysisPath))
+        var analysisPath = path.FullName;
+        foreach (var manifestFile in ManifestDetector.FindManifests(analysisPath))
         {
             Console.WriteLine(
                 "{0}", manifestFile.Replace(analysisPath, "")

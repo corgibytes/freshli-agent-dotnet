@@ -17,7 +17,7 @@ public class PackagesManifest : AbstractManifest
 
     public override void Parse(XmlDocument xmlDoc)
     {
-        XmlNodeList packages = xmlDoc.GetElementsByTagName(Element);
+        var packages = xmlDoc.GetElementsByTagName(Element);
         foreach (XmlNode package in packages)
         {
             if (package?.Attributes?.Count >= 2)
@@ -32,7 +32,7 @@ public class PackagesManifest : AbstractManifest
 
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
-        XmlNode? node = xmlDoc.SelectSingleNode($"*/{Element}[@{NameAttribute} = '{packageName}']");
+        var node = xmlDoc.SelectSingleNode($"*/{Element}[@{NameAttribute} = '{packageName}']");
         node.Attributes[VersionAttribute].Value = packageVersion;
     }
 

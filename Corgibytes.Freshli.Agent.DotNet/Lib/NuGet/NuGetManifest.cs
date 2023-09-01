@@ -17,7 +17,7 @@ public class NuGetManifest : AbstractManifest
 
     public override void Parse(XmlDocument xmlDoc)
     {
-        XmlNodeList packages = xmlDoc.GetElementsByTagName(Element);
+        var packages = xmlDoc.GetElementsByTagName(Element);
         foreach (XmlNode package in packages)
         {
             Add(
@@ -29,7 +29,7 @@ public class NuGetManifest : AbstractManifest
 
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
-        XmlNode? node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
+        var node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
         node.Attributes[VersionAttribute].Value = packageVersion;
     }
 

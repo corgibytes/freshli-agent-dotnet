@@ -14,8 +14,8 @@ public class Versions
     {
         s_logger.LogTrace("Update({ManifestFilePath}, {AsOfDate})", manifestFilePath, asOfDate);
         File.Copy(manifestFilePath, manifestFilePath + BackupSuffix, true);
-        IManifest manifest = GetManifest(manifestFilePath);
-        IPackageRepository repository = GetRepository(manifestFilePath);
+        var manifest = GetManifest(manifestFilePath);
+        var repository = GetRepository(manifestFilePath);
 
         var xmldoc = new XmlDocument();
         xmldoc.Load(manifestFilePath);
@@ -25,8 +25,8 @@ public class Versions
             return;
         }
 
-        bool manifestIsDirty = false;
-        foreach (PackageInfo node in manifest)
+        var manifestIsDirty = false;
+        foreach (var node in manifest)
         {
             var versionRange = VersionRange.Parse(node.Version);
             if (!versionRange.HasLowerAndUpperBounds)
@@ -37,12 +37,12 @@ public class Versions
             s_logger.LogTrace("Package {PackageId} has specified version range = {Version}",
                 node.Name, versionRange.ToNormalizedString());
 
-            IEnumerable<IVersionInfo> releaseHistory = repository.GetReleaseHistory(node.Name, false)
+            var releaseHistory = repository.GetReleaseHistory(node.Name, false)
                 .Where(release => release.DatePublished <= asOfDate);
 
             var latestVersion = new NuGetVersion(0, 0, 0);
             DateTimeOffset? latestPublished = null;
-            foreach (IVersionInfo release in releaseHistory)
+            foreach (var release in releaseHistory)
             {
                 var releaseVersion = new NuGetVersion(release.Version);
                 if (releaseVersion.CompareTo(latestVersion) > 0 &&
@@ -78,8 +78,8 @@ public class Versions
 
     public static IPackageRepository GetRepository(string manifestFilePath)
     {
-        IEnumerable<AbstractManifestFinder> finders = s_manifestDetector.ManifestFinders(manifestFilePath);
-        foreach (AbstractManifestFinder finder in finders)
+        var finders = s_manifestDetector.ManifestFinders(manifestFilePath);
+        foreach (var finder in finders)
         {
             return finder.RepositoryFor(manifestFilePath);
         }
@@ -89,7 +89,7 @@ public class Versions
 
     public static IManifest GetManifest(string manifestFilePath)
     {
-        AbstractManifestFinder finders = s_manifestDetector
+        var finders = s_manifestDetector
             .ManifestFinders(manifestFilePath)
             .First(finder => finder.IsFinderFor(manifestFilePath));
         return finders.ManifestFor(manifestFilePath);

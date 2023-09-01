@@ -15,12 +15,12 @@ public class NuGetRepository : IPackageRepository
         bool includePreReleaseVersions
     )
     {
-        if (_packages.TryGetValue(name, out IEnumerable<NuGetVersionInfo>? history))
+        if (_packages.TryGetValue(name, out var history))
         {
             return history;
         }
 
-        IEnumerable<IPackageSearchMetadata> versions = GetMetadata(name, includePreReleaseVersions);
+        var versions = GetMetadata(name, includePreReleaseVersions);
         _packages[name] = versions
             .OrderByDescending(nv => nv.Published)
             .Select(v => new NuGetVersionInfo(
@@ -31,19 +31,19 @@ public class NuGetRepository : IPackageRepository
         return _packages[name];
     }
 
-    private IEnumerable<IPackageSearchMetadata> GetMetadata(string name, bool includePreReleaseVersions)
+    private static IEnumerable<IPackageSearchMetadata> GetMetadata(string name, bool includePreReleaseVersions)
     {
-        ILogger logger = NullLogger.Instance;
-        CancellationToken cancellationToken = CancellationToken.None;
+        var logger = NullLogger.Instance;
+        var cancellationToken = CancellationToken.None;
 
         var cache = new SourceCacheContext();
-        SourceRepository repository = Repository.Factory.GetCoreV3(
+        var repository = Repository.Factory.GetCoreV3(
             "https://api.nuget.org/v3/index.json"
         );
-        PackageMetadataResource resource =
+        var resource =
             repository.GetResourceAsync<PackageMetadataResource>().Result;
 
-        IEnumerable<IPackageSearchMetadata> packages = resource.GetMetadataAsync(
+        var packages = resource.GetMetadataAsync(
             name,
             includePrerelease: includePreReleaseVersions,
             includeUnlisted: false,

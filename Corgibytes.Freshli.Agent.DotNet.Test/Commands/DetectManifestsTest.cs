@@ -9,8 +9,8 @@ public class DetectManifestsTest
     [Fact]
     public void Run_onProjectPath()
     {
-        string path = "./../../";
-        DirectoryInfo? directoryInfo = new DirectoryInfo(path).Parent;
+        var path = "./../../";
+        var directoryInfo = new DirectoryInfo(path).Parent;
         if (directoryInfo == null)
         {
             Assert.Fail($"Could not read {path} as directory");

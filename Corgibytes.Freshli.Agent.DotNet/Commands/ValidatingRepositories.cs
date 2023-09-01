@@ -15,8 +15,8 @@ public class ValidatingRepositories : Command
 
     public void Run()
     {
-        List<string> repositoryUrls = ValidatingData.RepositoryUrls();
-        foreach (string repositoryUrl in repositoryUrls)
+        var repositoryUrls = ValidatingData.RepositoryUrls();
+        foreach (var repositoryUrl in repositoryUrls)
         {
             Console.WriteLine(repositoryUrl);
         }

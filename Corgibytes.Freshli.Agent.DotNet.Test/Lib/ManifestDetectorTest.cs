@@ -18,9 +18,9 @@ public class ManifestDetectorTest
     [Fact]
     public void ManifestFinders()
     {
-        string analysisPath = Fixtures.Path();
+        var analysisPath = Fixtures.Path();
         IEnumerable<AbstractManifestFinder> manifestFinders = _manifestDetector.ManifestFinders(analysisPath).ToList();
-        foreach (AbstractManifestFinder abstractManifestFinder in manifestFinders)
+        foreach (var abstractManifestFinder in manifestFinders)
         {
             _output.WriteLine($"ManifestFinder: {abstractManifestFinder.GetType()}");
         }
@@ -31,9 +31,9 @@ public class ManifestDetectorTest
     [Fact]
     public void FindManifests()
     {
-        string analysisPath = Fixtures.Path();
-        IEnumerable<string> manifests = _manifestDetector.FindManifests(analysisPath);
-        foreach (string manifestFile in manifests)
+        var analysisPath = Fixtures.Path();
+        var manifests = _manifestDetector.FindManifests(analysisPath);
+        foreach (var manifestFile in manifests)
         {
             _output.WriteLine($"ManifestFinder: {manifestFile}");
         }

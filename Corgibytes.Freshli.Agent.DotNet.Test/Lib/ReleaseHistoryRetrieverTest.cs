@@ -13,7 +13,7 @@ public class ReleaseHistoryRetrieverTest
     [Fact]
     public void Retrieve()
     {
-        List<PackageReleaseData> packageReleases = new ReleaseHistoryRetriever()
+        var packageReleases = new ReleaseHistoryRetriever()
             .Retrieve("pkg:nuget/Corgibytes.Freshli.Lib@0.5.0");
         Assert.Equal(38, packageReleases.Count);
         packageReleases.ForEach(release =>

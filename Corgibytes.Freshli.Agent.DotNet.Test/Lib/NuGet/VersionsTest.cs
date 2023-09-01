@@ -14,12 +14,12 @@ public class VersionsTest
         Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         var xmldoc = new XmlDocument();
         xmldoc.Load(manifestFilePath);
-        IManifest manifest = Versions.GetManifest(manifestFilePath);
+        var manifest = Versions.GetManifest(manifestFilePath);
         Assert.NotNull(manifest);
         manifest.Parse(xmldoc);
-        foreach (PackageInfo expected in expectedUpdates)
+        foreach (var expected in expectedUpdates)
         {
-            PackageInfo packageInfo = manifest[expected.Name];
+            var packageInfo = manifest[expected.Name];
             Assert.Equal(expected.Version, packageInfo.Version);
         }
 

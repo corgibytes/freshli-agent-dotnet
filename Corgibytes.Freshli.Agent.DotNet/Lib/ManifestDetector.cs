@@ -29,13 +29,8 @@ public class ManifestDetector
     public IEnumerable<AbstractManifestFinder> ManifestFinders(string analysisPath)
     {
         _logger.LogDebug("ManifestFinders({AnalysisPath})", analysisPath);
-        IFileHistoryFinder? fileHistoryFinder = FileHistoryService.SelectFinderFor(analysisPath);
-        if (fileHistoryFinder is null)
-        {
-            throw new ManifestProcessingException();
-        }
-
-        IEnumerable<AbstractManifestFinder> manifestFinders =
+        var fileHistoryFinder = FileHistoryService.SelectFinderFor(analysisPath) ?? throw new ManifestProcessingException();
+        var manifestFinders =
             ManifestFinderRegistry.Finders
                 .Select(finder =>
                 {
@@ -49,7 +44,7 @@ public class ManifestDetector
     {
         _logger.LogDebug("FindManifests({AnalysisPath})", analysisPath);
         IList<string> manifests = new List<string>();
-        foreach (AbstractManifestFinder finder in ManifestFinders(analysisPath))
+        foreach (var finder in ManifestFinders(analysisPath))
         {
             manifests.AddRange(finder.GetManifestFilenames(analysisPath));
         }
