@@ -96,8 +96,8 @@ jobs:
 
       - name: "[Build]"
         run: |
-          bin/build.rb
+          bundle exec bin/build.rb
 
       - name: "[Test]"
         run: |
-          bin/test.rb
+          bundle exec bin/test.rb
