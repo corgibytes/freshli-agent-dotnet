@@ -79,6 +79,8 @@ public partial class ManifestProcessor
             .Task
             .Result;
 
+        FixBomLicenseNodes(Path.Combine(outDir, "bom.json"));
+
         if (asOfDate != null)
         {
             Versions.RestoreManifest(manifestFilePath);
@@ -110,4 +112,84 @@ public partial class ManifestProcessor
         throw new ManifestProcessingException("Failed to generate bill of materials.");
     }
 
+    private void FixBomLicenseNodes(string bomPath)
+    {
+        using var bomStream = new FileStream(bomPath, FileMode.Open, FileAccess.ReadWrite);
+        var bomRoot = JsonNode.Parse(bomStream)!;
+
+        FixBomLicenseNodes(bomRoot);
+        var bomContents = bomRoot.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+
+        bomStream.Seek(0, SeekOrigin.Begin);
+        using var bomWriter = new StreamWriter(bomStream);
+        bomWriter.Write(bomContents);
+        bomWriter.Close();
+    }
+
+    private void FixBomLicenseNodes(JsonNode node)
+    {
+        switch (node)
+        {
+            case JsonObject objectNode:
+                HandleJsonObject(objectNode);
+                break;
+
+            case JsonArray arrayNode:
+                HandleJsonArray(arrayNode);
+                break;
+        }
+    }
+
+    private void HandleJsonArray(JsonArray arrayNode)
+    {
+        foreach (var childNode in arrayNode)
+        {
+            if (childNode != null)
+            {
+                FixBomLicenseNodes(childNode);
+            }
+        }
+    }
+
+    private void HandleJsonObject(JsonObject objectNode)
+    {
+        if (HandleLicenseArray(objectNode))
+        {
+            return;
+        }
+
+        foreach (var childEntry in objectNode)
+        {
+            if (childEntry.Value != null)
+            {
+                FixBomLicenseNodes(childEntry.Value);
+            }
+        }
+    }
+
+    private static bool HandleLicenseArray(JsonObject objectNode)
+    {
+        if (!objectNode.ContainsKey("licenses") || objectNode["licenses"] is not JsonArray licensesArray)
+        {
+            return false;
+        }
+
+        foreach (var licenseChoiceNode in licensesArray)
+        {
+            if (licenseChoiceNode is not JsonObject objectLicenseChoiceNode ||
+                !((IDictionary<string, JsonNode?>)objectLicenseChoiceNode).TryGetValue("license", out var licenseNode))
+            {
+                continue;
+            }
+
+            if (licenseNode is JsonObject objectLicenseNode &&
+                objectLicenseNode.ContainsKey("url") &&
+                !objectLicenseNode.ContainsKey("name"))
+            {
+                objectLicenseNode["name"] = "Unknown - See URL";
+            }
+        }
+
+        return true;
+    }
 }
