@@ -26,7 +26,7 @@ public class ProcessManifest : Command
 
     public void Run(string manifestFile, DateTimeOffset? asOfDate)
     {
-        string bomFilePath = ManifestProcessor.ProcessManifest(manifestFile, asOfDate);
+        var bomFilePath = ManifestProcessor.ProcessManifest(manifestFile, asOfDate);
         Console.WriteLine(bomFilePath);
     }
 }
