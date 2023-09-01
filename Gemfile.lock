@@ -46,9 +46,13 @@ GEM
       rspec-expectations
       sqlite3
     google-protobuf (3.24.2-arm64-darwin)
+    google-protobuf (3.24.2-x86_64-linux)
     googleapis-common-protos-types (1.8.0)
       google-protobuf (~> 3.18)
     grpc (1.57.0)
+      google-protobuf (~> 3.23)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.57.0-x86_64-linux)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.57.0)
@@ -89,6 +93,7 @@ GEM
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     sqlite3 (1.6.4-arm64-darwin)
+    sqlite3 (1.6.4-x86_64-linux)
     sys-uname (1.2.3)
       ffi (~> 1.1)
     thor (1.2.2)
@@ -96,6 +101,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-22
+  x86_64-linux
 
 DEPENDENCIES
   freshli-commons
