@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Xunit;
 
@@ -52,9 +53,14 @@ public class ManifestProcessorTest
     [Fact]
     public void ProcessOpserverManifest()
     {
+        // This manifest file results in an error, because one of the packages is no longer
+        // listed. The CylcloneDX DotNet tool attempts to run NuGet restore on the manifest
+        // file, and that process fails when the package is unlisted.
         var path = Fixtures.Path("config", "Opserver.Core", "packages.config");
         var asOfDate = DateTimeOffset.Parse("2015-05-01T00:00:00.0000Z");
-        var bomPath = _manifestProcessor.ProcessManifest(path, asOfDate);
-        Assert.Empty(bomPath);
+        Assert.Throws<ManifestProcessingException>(() =>
+        {
+            _manifestProcessor.ProcessManifest(path, asOfDate);
+        });
     }
 }
