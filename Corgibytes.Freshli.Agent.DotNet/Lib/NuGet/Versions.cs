@@ -7,15 +7,19 @@ namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 public class Versions
 {
     private static readonly ILogger<Versions> s_logger = Logging.Logger<Versions>();
-    private static readonly ManifestDetector s_manifestDetector = new();
     public const string BackupSuffix = ".versionsBackup";
 
     public static void UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
     {
+        if (manifestFilePath.EndsWith(".config"))
+        {
+            return;
+        }
+
         s_logger.LogTrace("Update({ManifestFilePath}, {AsOfDate})", manifestFilePath, asOfDate);
         File.Copy(manifestFilePath, manifestFilePath + BackupSuffix, true);
-        var manifest = GetManifest(manifestFilePath);
-        var repository = GetRepository(manifestFilePath);
+        var manifest = new NuGetManifest();
+        var repository = new NuGetRepository();
 
         var xmldoc = new XmlDocument();
         xmldoc.Load(manifestFilePath);
@@ -74,24 +78,5 @@ public class Versions
         {
             File.Move(manifestFilePath + BackupSuffix, manifestFilePath, true);
         }
-    }
-
-    public static IPackageRepository GetRepository(string manifestFilePath)
-    {
-        var finders = s_manifestDetector.ManifestFinders(manifestFilePath);
-        foreach (var finder in finders)
-        {
-            return finder.RepositoryFor(manifestFilePath);
-        }
-
-        return new NuGetRepository();
-    }
-
-    public static IManifest GetManifest(string manifestFilePath)
-    {
-        var finders = s_manifestDetector
-            .ManifestFinders(manifestFilePath)
-            .First(finder => finder.IsFinderFor(manifestFilePath));
-        return finders.ManifestFor(manifestFilePath);
     }
 }

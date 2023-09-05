@@ -33,17 +33,15 @@ public class PackagesManifest : AbstractManifest
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
         var node = xmlDoc.SelectSingleNode($"*/{Element}[@{NameAttribute} = '{packageName}']");
-        if (node != null)
+        if (node is not { Attributes: not null })
         {
-            var attributes = node.Attributes;
-            if (attributes != null)
-            {
-                var versionAttribute = attributes[VersionAttribute];
-                if (versionAttribute != null)
-                {
-                    versionAttribute.Value = packageVersion;
-                }
-            }
+            return;
+        }
+
+        var versionAttribute = node.Attributes[VersionAttribute];
+        if (versionAttribute != null)
+        {
+            versionAttribute.Value = packageVersion;
         }
     }
 

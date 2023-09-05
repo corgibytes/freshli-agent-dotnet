@@ -8,13 +8,13 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet;
 public class VersionsTest
 {
     [Theory]
-    [MemberData(nameof(UpdateManifestArgs))]
-    public void UpdateManifest(string manifestFilePath, string date, PackageInfo[] expectedUpdates)
+    [MemberData(nameof(UpdateNuGetManifestArgs))]
+    public void UpdateNuGetManifest(string manifestFilePath, string date, PackageInfo[] expectedUpdates)
     {
         Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         var xmldoc = new XmlDocument();
         xmldoc.Load(manifestFilePath);
-        var manifest = Versions.GetManifest(manifestFilePath);
+        var manifest = new NuGetManifest();
         Assert.NotNull(manifest);
         manifest.Parse(xmldoc);
         foreach (var expected in expectedUpdates)
@@ -27,7 +27,27 @@ public class VersionsTest
         Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
     }
 
-    public static IEnumerable<object?[]> UpdateManifestArgs =>
+    [Theory]
+    [MemberData(nameof(UpdatePackagesManifestArgs))]
+    public void UpdatePackagesManifest(string manifestFilePath, string date, PackageInfo[] expectedUpdates)
+    {
+        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
+        var xmldoc = new XmlDocument();
+        xmldoc.Load(manifestFilePath);
+        var manifest = new PackagesManifest();
+        Assert.NotNull(manifest);
+        manifest.Parse(xmldoc);
+        foreach (var expected in expectedUpdates)
+        {
+            var packageInfo = manifest[expected.Name];
+            Assert.Equal(expected.Version, packageInfo.Version);
+        }
+
+        Versions.RestoreManifest(manifestFilePath);
+        Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
+    }
+
+    public static IEnumerable<object?[]> UpdateNuGetManifestArgs =>
         new List<object?[]>
         {
             // If passing no arguments, the default git path should be 'git'
@@ -48,10 +68,19 @@ public class VersionsTest
             },
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), DateTimeOffset.Now.ToString("o"),
+                Fixtures.Path("csproj", "Project.csproj"), "2023-09-05T00:00:00.0000000Z",
                 new[] { new PackageInfo("DotNetEnv", "1.4.0") }
             },
-            // now assert that packages.config files are pinned appropriately
+            new object?[]
+            {
+                Fixtures.Path("csproj", "Project.csproj"), "2023-09-05T00:00:00.0000000Z",
+                new[] { new PackageInfo("NLog", "4.7.7") }
+            },
+        };
+
+    public static IEnumerable<object?[]> UpdatePackagesManifestArgs =>
+        new List<object?[]>
+        {
             new object?[]
             {
                 Fixtures.Path("config", "packages.config"), "2015-06-10T00:00:00.0000000Z",
@@ -60,12 +89,13 @@ public class VersionsTest
             new object?[]
             {
                 Fixtures.Path("config", "packages.config"), "2019-12-31T00:00:00.0000000Z",
-                new[] { new PackageInfo("NLog", "4.6.8") }
+                new[] { new PackageInfo("NLog", "4.0.0") }
             },
             new object?[]
             {
                 Fixtures.Path("config", "packages.config"), DateTimeOffset.Now.ToString("o"),
-                new[] { new PackageInfo("NLog", "4.7.15") }
+                new[] { new PackageInfo("NLog", "4.0.0") }
             }
         };
+
 }

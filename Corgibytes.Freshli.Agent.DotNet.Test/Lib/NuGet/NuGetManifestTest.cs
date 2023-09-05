@@ -34,7 +34,6 @@ public class NuGetManifestTest
         manifest.Update(xmldoc, "NLog", "5.2.0");
 
         var node = xmldoc.SelectSingleNode($"/Project/ItemGroup/{NuGetManifest.Element}[@{NuGetManifest.NameAttribute} = 'NLog']");
-        Assert.NotNull(node);
-        Assert.Equal("5.2.0", node.Attributes[NuGetManifest.VersionAttribute].Value);
+        Assert.Equal("5.2.0", node!.Attributes![NuGetManifest.VersionAttribute]!.Value);
     }
 }

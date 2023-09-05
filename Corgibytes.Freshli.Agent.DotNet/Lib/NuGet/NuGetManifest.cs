@@ -30,7 +30,16 @@ public class NuGetManifest : AbstractManifest
     public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
     {
         var node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
-        node.Attributes[VersionAttribute].Value = packageVersion;
+        if (node is not { Attributes: not null })
+        {
+            return;
+        }
+
+        var versionAttribute = node.Attributes[VersionAttribute];
+        if (versionAttribute != null)
+        {
+            versionAttribute.Value = packageVersion;
+        }
     }
 
     public override bool UsesExactMatches => true;

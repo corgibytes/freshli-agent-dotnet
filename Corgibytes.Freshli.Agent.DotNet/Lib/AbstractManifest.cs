@@ -36,11 +36,6 @@ public abstract class AbstractManifest : IManifest
         );
     }
 
-    public void Clear()
-    {
-        _packages.Clear();
-    }
-
     public abstract void Parse(string contents);
     public abstract void Parse(XmlDocument xmlDoc);
 

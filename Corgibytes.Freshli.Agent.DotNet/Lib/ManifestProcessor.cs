@@ -10,14 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
-public enum CycloneDxExitCode
-{
-    Ok,
-    OkFail,
-    IOError
-}
-
-public partial class ManifestProcessor
+public class ManifestProcessor
 {
     private readonly ILogger<ManifestProcessor> _logger = Logging.Logger<ManifestProcessor>();
 
@@ -84,37 +77,28 @@ public partial class ManifestProcessor
             .Task
             .Result;
 
-        FixBomLicenseNodes(Path.Combine(outDir, "bom.json"));
-
         if (asOfDate != null)
         {
             Versions.RestoreManifest(manifestFilePath);
         }
 
-        if (commandResult.ExitCode != (int)CycloneDxExitCode.Ok)
+        if (commandResult.ExitCode != 0)
         {
             _logger.LogError("Error running CycloneDX");
 
-            if (commandResult.ExitCode is (int)CycloneDxExitCode.IOError or (int)CycloneDxExitCode.OkFail)
-            {
-                throw new ManifestProcessingException(
-                    $"CycloneDX execution failed with exitCode = {commandResult.ExitCode}"
-                );
-            }
-
-            return "";
+            throw new ManifestProcessingException(
+                $"CycloneDX execution failed with exitCode = {commandResult.ExitCode}"
+            );
         }
-        // The CycloneDX cli tool will exit with different error codes
-        // to
-        // indicate the problem. The agent needs to absorb most of them,
-        // notify the caller of problems, but not cause errors that
-        // can not be dealt with properly
-        if (File.Exists(outFile))
+
+        if (!File.Exists(outFile))
         {
-            return outFile;
+            throw new ManifestProcessingException("Failed to generate bill of materials.");
         }
 
-        throw new ManifestProcessingException("Failed to generate bill of materials.");
+        FixBomLicenseNodes(outFile);
+
+        return outFile;
     }
 
     private void FixBomLicenseNodes(string bomPath)

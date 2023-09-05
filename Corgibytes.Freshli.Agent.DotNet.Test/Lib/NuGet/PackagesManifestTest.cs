@@ -33,7 +33,6 @@ public class PackagesManifestTest
         manifest.Update(xmldoc, "NLog", "5.2.0");
 
         var node = xmldoc.SelectSingleNode($"*/{PackagesManifest.Element}[@{PackagesManifest.NameAttribute} = 'NLog']");
-        Assert.NotNull(node);
-        Assert.Equal("5.2.0", node.Attributes[PackagesManifest.VersionAttribute].Value);
+        Assert.Equal("5.2.0", node!.Attributes![PackagesManifest.VersionAttribute]!.Value);
     }
 }
