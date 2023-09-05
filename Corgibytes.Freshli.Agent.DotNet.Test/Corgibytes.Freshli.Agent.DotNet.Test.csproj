@@ -11,11 +11,13 @@
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-        <PackageReference Include="NUnit" Version="3.13.3" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-        <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
         <PackageReference Include="coverlet.collector" Version="3.1.2" />
-        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit" Version="2.5.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+
     </ItemGroup>
 
     <ItemGroup>
@@ -29,11 +31,9 @@
     <None Update="Fixtures\config\Opserver.Core\packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Fixtures\csproj\Project.csproj">
+    <None Include="Fixtures\csproj\Project.csproj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <Target Name="CleanFixtureDir" AfterTargets="Clean">
