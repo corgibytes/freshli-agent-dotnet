@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <Target Name="CleanFixtureDir" AfterTargets="Clean">
-    <RemoveDir Directories="$(OutputPath)/Fixtures" />
+    <RemoveDir Directories="$(OutputPath)Fixtures" />
   </Target>
 
 </Project>

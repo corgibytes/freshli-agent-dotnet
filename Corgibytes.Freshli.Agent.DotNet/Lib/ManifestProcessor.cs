@@ -1,8 +1,5 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
-
 using CliWrap;
 using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;

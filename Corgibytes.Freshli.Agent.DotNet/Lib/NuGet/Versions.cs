@@ -1,4 +1,3 @@
-using System.Xml;
 using Microsoft.Extensions.Logging;
 using NuGet.Versioning;
 
@@ -21,9 +20,7 @@ public class Versions
         var manifest = new NuGetManifest();
         var repository = new NuGetRepository();
 
-        var xmldoc = new XmlDocument();
-        xmldoc.Load(manifestFilePath);
-        manifest.Parse(xmldoc);
+        manifest.Parse(File.ReadAllText(manifestFilePath));
         if (manifest.Count <= 0)
         {
             return;
@@ -59,7 +56,7 @@ public class Versions
 
             if (latestVersion.CompareTo(new NuGetVersion(0, 0, 0)) != 0)
             {
-                manifest.Update(xmldoc, node.Name, latestVersion.ToString());
+                manifest.Update(node.Name, latestVersion.ToString());
                 manifestIsDirty = true;
                 s_logger.LogDebug("Updating {PackageId} to version = {Version} published on {PublishedOn}",
                     node.Name, latestVersion, latestPublished);
@@ -68,7 +65,7 @@ public class Versions
 
         if (manifestIsDirty)
         {
-            xmldoc.Save(manifestFilePath);
+            manifest.Save(manifestFilePath);
         }
     }
 

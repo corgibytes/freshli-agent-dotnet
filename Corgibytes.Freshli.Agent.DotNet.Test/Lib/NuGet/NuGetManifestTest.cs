@@ -28,11 +28,15 @@ public class NuGetManifestTest
     [Fact]
     public void Update()
     {
-        var xmldoc = new XmlDocument();
-        xmldoc.LoadXml(TestContent);
         var manifest = new NuGetManifest();
-        manifest.Update(xmldoc, "NLog", "5.2.0");
+        manifest.Parse(TestContent);
+        manifest.Update("NLog", "5.2.0");
 
+        var tempFile = Path.GetTempFileName();
+        manifest.Save(tempFile);
+
+        var xmldoc = new XmlDocument();
+        xmldoc.Load(tempFile);
         var node = xmldoc.SelectSingleNode($"/Project/ItemGroup/{NuGetManifest.Element}[@{NuGetManifest.NameAttribute} = 'NLog']");
         Assert.Equal("5.2.0", node!.Attributes![NuGetManifest.VersionAttribute]!.Value);
     }

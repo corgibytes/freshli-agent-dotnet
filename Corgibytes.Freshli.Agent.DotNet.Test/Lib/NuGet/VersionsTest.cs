@@ -1,4 +1,3 @@
-using System.Xml;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Xunit;
@@ -9,42 +8,59 @@ public class VersionsTest
 {
     [Theory]
     [MemberData(nameof(UpdateNuGetManifestArgs))]
-    public void UpdateNuGetManifest(string manifestFilePath, string date, PackageInfo[] expectedUpdates)
+    public void UpdateNuGetManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
     {
+        var manifestFilePath = Fixtures.Path(manifestFixturePath);
+        File.WriteAllText(manifestFilePath, File.ReadAllText(manifestFilePath));
         Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
-        var xmldoc = new XmlDocument();
-        xmldoc.Load(manifestFilePath);
-        var manifest = new NuGetManifest();
-        Assert.NotNull(manifest);
-        manifest.Parse(xmldoc);
-        foreach (var expected in expectedUpdates)
+        try
         {
-            var packageInfo = manifest[expected.Name];
-            Assert.Equal(expected.Version, packageInfo.Version);
+            var manifest = new NuGetManifest();
+            manifest.Parse(File.ReadAllText(manifestFilePath));
+            foreach (var expected in expectedUpdates)
+            {
+                var packageInfo = manifest[expected.Name];
+                Assert.Equal(expected.Version, packageInfo.Version);
+            }
         }
-
-        Versions.RestoreManifest(manifestFilePath);
-        Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
+        finally
+        {
+            Versions.RestoreManifest(manifestFilePath);
+            Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
+            if (File.Exists(manifestFilePath))
+            {
+                File.Delete(manifestFilePath);
+            }
+        }
     }
 
     [Theory]
     [MemberData(nameof(UpdatePackagesManifestArgs))]
-    public void UpdatePackagesManifest(string manifestFilePath, string date, PackageInfo[] expectedUpdates)
+    public void UpdatePackagesManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
     {
-        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
-        var xmldoc = new XmlDocument();
-        xmldoc.Load(manifestFilePath);
-        var manifest = new PackagesManifest();
-        Assert.NotNull(manifest);
-        manifest.Parse(xmldoc);
-        foreach (var expected in expectedUpdates)
-        {
-            var packageInfo = manifest[expected.Name];
-            Assert.Equal(expected.Version, packageInfo.Version);
-        }
+        var manifestFilePath = Fixtures.Path(manifestFixturePath);
+        File.WriteAllText(manifestFilePath, File.ReadAllText(manifestFilePath));
 
-        Versions.RestoreManifest(manifestFilePath);
-        Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
+        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
+        try
+        {
+            var manifest = new PackagesManifest();
+            manifest.Parse(File.ReadAllText(manifestFilePath));
+            foreach (var expected in expectedUpdates)
+            {
+                var packageInfo = manifest[expected.Name];
+                Assert.Equal(expected.Version, packageInfo.Version);
+            }
+        }
+        finally
+        {
+            Versions.RestoreManifest(manifestFilePath);
+            Assert.False(File.Exists(manifestFilePath + Versions.BackupSuffix));
+            if (File.Exists(manifestFilePath))
+            {
+                File.Delete(manifestFilePath);
+            }
+        }
     }
 
     public static IEnumerable<object?[]> UpdateNuGetManifestArgs =>
@@ -53,27 +69,27 @@ public class VersionsTest
             // If passing no arguments, the default git path should be 'git'
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), "2017-12-10T00:00:00.0000000Z",
+                new[] {"csproj", "Project.csproj" }, "2017-12-10T00:00:00.0000000Z",
                 new[] { new PackageInfo("DotNetEnv", "1.1.0") }
             },
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), "2019-12-05T00:00:00.0000000Z",
+                new[] { "csproj", "Project.csproj" }, "2019-12-05T00:00:00.0000000Z",
                 new[] { new PackageInfo("DotNetEnv", "1.2.0") }
             },
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), "2019-12-06T00:00:00.0000000Z",
+                new[] { "csproj", "Project.csproj" }, "2019-12-06T00:00:00.0000000Z",
                 new[] { new PackageInfo("DotNetEnv", "1.3.1") }
             },
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), "2023-09-05T00:00:00.0000000Z",
+                new[] { "csproj", "Project.csproj" }, "2023-09-05T00:00:00.0000000Z",
                 new[] { new PackageInfo("DotNetEnv", "1.4.0") }
             },
             new object?[]
             {
-                Fixtures.Path("csproj", "Project.csproj"), "2023-09-05T00:00:00.0000000Z",
+                new[] { "csproj", "Project.csproj" }, "2023-09-05T00:00:00.0000000Z",
                 new[] { new PackageInfo("NLog", "4.7.7") }
             },
         };
@@ -83,17 +99,17 @@ public class VersionsTest
         {
             new object?[]
             {
-                Fixtures.Path("config", "packages.config"), "2015-06-10T00:00:00.0000000Z",
+                new[] { "config", "packages.config" }, "2015-06-10T00:00:00.0000000Z",
                 new[] { new PackageInfo("NLog", "4.0.0") }
             },
             new object?[]
             {
-                Fixtures.Path("config", "packages.config"), "2019-12-31T00:00:00.0000000Z",
+                new[] { "config", "packages.config" }, "2019-12-31T00:00:00.0000000Z",
                 new[] { new PackageInfo("NLog", "4.0.0") }
             },
             new object?[]
             {
-                Fixtures.Path("config", "packages.config"), DateTimeOffset.Now.ToString("o"),
+                new[] { "config", "packages.config" }, "2023-09-05T00:00:00.0000000Z",
                 new[] { new PackageInfo("NLog", "4.0.0") }
             }
         };

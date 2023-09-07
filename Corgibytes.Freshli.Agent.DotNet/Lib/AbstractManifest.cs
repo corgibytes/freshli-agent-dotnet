@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
 
-public abstract class AbstractManifest : IManifest
+public abstract class AbstractManifest : IEnumerable<PackageInfo>
 {
     private readonly ILogger<AbstractManifest> _logger = Logging.Logger<AbstractManifest>();
 
@@ -12,7 +12,8 @@ public abstract class AbstractManifest : IManifest
         new Dictionary<string, PackageInfo>();
 
     public int Count => _packages.Count;
-    public abstract bool UsesExactMatches { get; }
+
+    protected XmlDocument? InnerDocument { get; private set; }
 
     public IEnumerator<PackageInfo> GetEnumerator()
     {
@@ -24,7 +25,7 @@ public abstract class AbstractManifest : IManifest
         return GetEnumerator();
     }
 
-    public void Add(string packageName, string packageVersion)
+    protected void Add(string packageName, string packageVersion)
     {
         _packages[packageName] = new PackageInfo(
             packageName,
@@ -36,10 +37,22 @@ public abstract class AbstractManifest : IManifest
         );
     }
 
-    public abstract void Parse(string contents);
-    public abstract void Parse(XmlDocument xmlDoc);
+    public void Parse(string contents)
+    {
+        InnerDocument = new XmlDocument();
+        InnerDocument.LoadXml(contents);
+        ParseInnerDocument();
+    }
 
-    public abstract void Update(XmlDocument xmlDoc, string packageName, string packageVersion);
+    protected abstract void ParseInnerDocument();
+
+    // ReSharper disable once UnusedMemberInSuper.Global
+    public abstract void Update(string packageName, string packageVersion);
 
     public PackageInfo this[string packageName] => _packages[packageName];
+
+    public void Save(string targetPath)
+    {
+        InnerDocument?.Save(targetPath);
+    }
 }

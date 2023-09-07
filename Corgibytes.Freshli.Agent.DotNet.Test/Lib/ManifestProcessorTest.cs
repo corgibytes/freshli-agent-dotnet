@@ -15,7 +15,7 @@ public class ManifestProcessorTest
         var path = Fixtures.Path("csproj", "Project.csproj");
         var projectFile = new DirectoryInfo(path);
         var analysisPath = projectFile.FullName;
-        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Now.AddMonths(-3));
+        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Parse("2023-09-06T00:00:00.0000000Z"));
         Assert.NotEmpty(bomFilePath);
 
         var expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
@@ -36,7 +36,7 @@ public class ManifestProcessorTest
 
         var projectFile = new DirectoryInfo(path);
         var analysisPath = projectFile.FullName;
-        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Now.AddMonths(-3));
+        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Parse("2023-09-05T00:00:00.0000000Z"));
         Assert.NotEmpty(bomFilePath);
 
         var expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
