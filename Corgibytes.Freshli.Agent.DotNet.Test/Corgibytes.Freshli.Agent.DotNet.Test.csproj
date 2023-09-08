@@ -36,6 +36,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <Target Name="CleanFixtureDir" AfterTargets="Clean">
     <RemoveDir Directories="$(OutputPath)Fixtures" />
