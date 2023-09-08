@@ -27,13 +27,16 @@ public class PackagesManifestTest
     [Fact]
     public void Update()
     {
-        var xmldoc = new XmlDocument();
-        xmldoc.LoadXml(TestContent);
         var manifest = new PackagesManifest();
-        manifest.Update(xmldoc, "NLog", "5.2.0");
+        manifest.Parse(TestContent);
+        manifest.Update("NLog", "5.2.0");
 
-        XmlNode? node = xmldoc.SelectSingleNode($"*/{PackagesManifest.Element}[@{PackagesManifest.NameAttribute} = 'NLog']");
-        Assert.NotNull(node);
-        Assert.Equal("5.2.0", node.Attributes[PackagesManifest.VersionAttribute].Value);
+        var tempFile = Path.GetTempFileName();
+        manifest.Save(tempFile);
+
+        var xmldoc = new XmlDocument();
+        xmldoc.Load(tempFile);
+        var node = xmldoc.SelectSingleNode($"*/{PackagesManifest.Element}[@{PackagesManifest.NameAttribute} = 'NLog']");
+        Assert.Equal("5.2.0", node!.Attributes![PackagesManifest.VersionAttribute]!.Value);
     }
 }

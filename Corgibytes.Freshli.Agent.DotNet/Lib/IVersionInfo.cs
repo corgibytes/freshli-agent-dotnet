@@ -6,5 +6,6 @@ public interface IVersionInfo : IComparable
 
     public DateTimeOffset DatePublished { get; }
 
+    // ReSharper disable once UnusedMemberInSuper.Global
     public bool IsPreRelease { get; }
 }

@@ -21,32 +21,31 @@ public class AgentService : Agent.AgentBase
 
     public override Task<BomLocation> ProcessManifest(ProcessingRequest request, ServerCallContext context)
     {
-        DateTimeOffset asOfDate = request.Moment?.ToDateTimeOffset() ?? DateTimeOffset.Now;
+        var asOfDate = request.Moment?.ToDateTimeOffset() ?? DateTimeOffset.Now;
         _logger.LogInformation("ProcessManifest() - manifestPath: {ManifestPath}, asOfDate: {AsOfDate}",
             request.Manifest.Path, asOfDate.ToString());
         try
         {
-            string bomLocation =
+            var bomLocation =
                 _manifestProcessor.ProcessManifest(request.Manifest.Path, asOfDate);
             return Task.FromResult(new BomLocation() { Path = bomLocation });
         }
         catch (ManifestProcessingException error)
         {
-            string errorMessage = $"Error processing {request.Manifest.Path}@{asOfDate}: {error.Message}";
-            _logger.LogError("{ErrorMessage}", errorMessage);
+            var errorMessage = $"Error processing {request.Manifest.Path}@{asOfDate}: {error.Message}";
+            _logger.LogWarning("{ErrorMessage}", errorMessage);
             _logger.LogDebug("Exception.details: {Detail}", error.Details);
-            throw new RpcException(
-                new Status(StatusCode.Internal, "Processing Error"),
-                errorMessage);
+
+            return Task.FromResult(new BomLocation() { Path = "" });
         }
     }
 
     public override Task DetectManifests(ProjectLocation request, IServerStreamWriter<ManifestLocation> responseStream,
         ServerCallContext context)
     {
-        string projectLocation = request.Path;
+        var projectLocation = request.Path;
         _logger.LogInformation("DetectManifests() - {ProjectLocation}", projectLocation);
-        foreach (string filename in new ManifestDetector().FindManifests(projectLocation))
+        foreach (var filename in new ManifestDetector().FindManifests(projectLocation))
         {
             responseStream.WriteAsync(
                 new ManifestLocation() { Path = Path.Combine(projectLocation, filename) },
@@ -86,8 +85,8 @@ public class AgentService : Agent.AgentBase
         ServerCallContext context)
     {
         _logger.LogInformation("GetValidatingPackages()");
-        List<string> packageUrls = ValidatingData.PackageUrls();
-        foreach (string packageUrl in packageUrls)
+        var packageUrls = ValidatingData.PackageUrls();
+        foreach (var packageUrl in packageUrls)
         {
             responseStream.WriteAsync(new Package() { Purl = packageUrl }, context.CancellationToken);
         }
@@ -99,8 +98,8 @@ public class AgentService : Agent.AgentBase
         IServerStreamWriter<RepositoryLocation> responseStream, ServerCallContext context)
     {
         _logger.LogInformation("GetValidatingRepositories()");
-        List<string> repositoryUrls = ValidatingData.RepositoryUrls();
-        foreach (string repositoryUrl in repositoryUrls)
+        var repositoryUrls = ValidatingData.RepositoryUrls();
+        foreach (var repositoryUrl in repositoryUrls)
         {
             responseStream.WriteAsync(new RepositoryLocation() { Url = repositoryUrl }, context.CancellationToken);
         }

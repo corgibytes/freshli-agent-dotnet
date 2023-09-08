@@ -13,7 +13,7 @@ Feature: Invoking ProcessManifest via gRPC
     Given I clone the git repository "https://github.com/corgibytes/freshli-fixture-csharp-test" with the sha "583d813db3e28b9b44a29db352e2f0e1b4c6e420"
     When I run `freshli-agent-dotnet start-server 8392` interactively
     Then I wait for the freshli_agent.proto gRPC service to be running on port 8392
-    And I call ProcessManifest with the expanded path "tmp/repositories/freshli-fixture-csharp-test/TestProject.csproj" and the moment "2022-01-01T00:00:00Z" on port 8392
+    When I call ProcessManifest with the expanded path "tmp/repositories/freshli-fixture-csharp-test/TestProject.csproj" and the moment "2022-01-01T00:00:00Z" on port 8392
     Then the ProcessManifest response contains the following file paths expanded beneath "tmp/repositories/freshli-fixture-csharp-test":
     """
     obj/bom.json
@@ -24,3 +24,19 @@ Feature: Invoking ProcessManifest via gRPC
     When the gRPC service on port 8392 is sent the shutdown command
     Then there are no services running on port 8392
     And the exit status should be 0
+
+  Scenario: Unlisted package in manifest file
+    This project includes a manifest file that contains references to packages versions
+    that have been unlisted. NuGet restore fails as a result, and the CycloneDX DotNet
+    tool isn't able to generate a BOM file.
+
+    Given I clone the git repository "https://github.com/opserver/Opserver" with the sha "ac8f6d8e75d061137017d2bd6a47a81100dcf40e"
+    When I run `freshli-agent-dotnet start-server 8392` interactively
+    Then I wait for the freshli_agent.proto gRPC service to be running on port 8392
+    When I call ProcessManifest with the expanded path "tmp/repositories/Opserver/Opserver.Core/packages.config" and the moment "2022-01-01T00:00:00Z" on port 8392
+    Then the ProcessManifest response is empty
+    And running git status should not report any modifications for "tmp/repositories/Opserver"
+    When the gRPC service on port 8392 is sent the shutdown command
+    Then there are no services running on port 8392
+    And the exit status should be 0
+

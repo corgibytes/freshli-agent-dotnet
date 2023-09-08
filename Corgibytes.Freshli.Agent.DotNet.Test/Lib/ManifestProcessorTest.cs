@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Corgibytes.Freshli.Agent.DotNet.Exceptions;
 using Corgibytes.Freshli.Agent.DotNet.Lib;
 using Xunit;
 
@@ -11,19 +12,19 @@ public class ManifestProcessorTest
     [Fact]
     public void ProcessProjectManifest()
     {
-        string path = Fixtures.Path("csproj", "Project.csproj");
+        var path = Fixtures.Path("csproj", "Project.csproj");
         var projectFile = new DirectoryInfo(path);
-        string analysisPath = projectFile.FullName;
-        string bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Now.AddMonths(-3));
+        var analysisPath = projectFile.FullName;
+        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Parse("2023-09-06T00:00:00.0000000Z"));
         Assert.NotEmpty(bomFilePath);
 
-        string expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
+        var expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
         Assert.Equal(expectedBomFilePath, bomFilePath);
         Assert.True(File.Exists(bomFilePath));
-        Dictionary<string, JsonElement>? json =
+        var json =
             JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(bomFilePath));
         Assert.Equal(7, json?.Count);
-        JsonElement components = json!["components"];
+        var components = json!["components"];
         Assert.Equal(79, components.GetArrayLength());
         File.Delete(expectedBomFilePath);
     }
@@ -31,20 +32,20 @@ public class ManifestProcessorTest
     [Fact]
     public void ProcessPackagesManifest()
     {
-        string path = Fixtures.Path("config", "packages.config");
+        var path = Fixtures.Path("config", "packages.config");
 
         var projectFile = new DirectoryInfo(path);
-        string analysisPath = projectFile.FullName;
-        string bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Now.AddMonths(-3));
+        var analysisPath = projectFile.FullName;
+        var bomFilePath = _manifestProcessor.ProcessManifest(analysisPath, DateTimeOffset.Parse("2023-09-05T00:00:00.0000000Z"));
         Assert.NotEmpty(bomFilePath);
 
-        string expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
+        var expectedBomFilePath = projectFile.Parent!.FullName + "/obj/bom.json";
         Assert.Equal(expectedBomFilePath, bomFilePath);
         Assert.True(File.Exists(bomFilePath));
-        Dictionary<string, JsonElement>? json =
+        var json =
             JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(bomFilePath));
         Assert.Equal(7, json?.Count);
-        JsonElement components = json!["components"];
+        var components = json!["components"];
         Assert.Equal(4, components.GetArrayLength());
         File.Delete(expectedBomFilePath);
     }
@@ -52,9 +53,14 @@ public class ManifestProcessorTest
     [Fact]
     public void ProcessOpserverManifest()
     {
-        string path = Fixtures.Path("config", "Opserver.Core", "packages.config");
+        // This manifest file results in an error, because one of the packages is no longer
+        // listed. The CylcloneDX DotNet tool attempts to run NuGet restore on the manifest
+        // file, and that process fails when the package is unlisted.
+        var path = Fixtures.Path("config", "Opserver.Core", "packages.config");
         var asOfDate = DateTimeOffset.Parse("2015-05-01T00:00:00.0000Z");
-        string bomPath = _manifestProcessor.ProcessManifest(path, asOfDate);
-        Assert.Empty(bomPath);
+        Assert.Throws<ManifestProcessingException>(() =>
+        {
+            _manifestProcessor.ProcessManifest(path, asOfDate);
+        });
     }
 }

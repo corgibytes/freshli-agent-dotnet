@@ -21,9 +21,9 @@ public class AgentServer
 
     public void Start()
     {
-        string? assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(
+        var builder = WebApplication.CreateBuilder(
             new WebApplicationOptions() { ContentRootPath = assemblyPath });
 
         builder.WebHost.ConfigureKestrel(options =>

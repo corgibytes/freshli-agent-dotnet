@@ -49,7 +49,7 @@ public class NuGetVersionInfoTest
     [Fact]
     public void ProvidesVersion()
     {
-        string version = "1.0.0";
+        var version = "1.0.0";
         var versionInfo = new NuGetVersionInfo(
             new NuGetVersion(version), DateTimeOffset.UtcNow
         );

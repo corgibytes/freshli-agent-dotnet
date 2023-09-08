@@ -8,16 +8,14 @@ public class NuGetManifest : AbstractManifest
     public const string NameAttribute = "Include";
     public const string VersionAttribute = "Version";
 
-    public override void Parse(string contents)
+    protected override void ParseInnerDocument()
     {
-        var xmlDoc = new XmlDocument();
-        xmlDoc.LoadXml(contents);
-        Parse(xmlDoc);
-    }
+        if (InnerDocument is null)
+        {
+            return;
+        }
 
-    public override void Parse(XmlDocument xmlDoc)
-    {
-        XmlNodeList packages = xmlDoc.GetElementsByTagName(Element);
+        var packages = InnerDocument.GetElementsByTagName(Element);
         foreach (XmlNode package in packages)
         {
             Add(
@@ -27,11 +25,18 @@ public class NuGetManifest : AbstractManifest
         }
     }
 
-    public override void Update(XmlDocument xmlDoc, string packageName, string packageVersion)
+    public override void Update(string packageName, string packageVersion)
     {
-        XmlNode? node = xmlDoc.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
-        node.Attributes[VersionAttribute].Value = packageVersion;
-    }
+        var node = InnerDocument?.SelectSingleNode($"/Project/ItemGroup/{Element}[@{NameAttribute} = '{packageName}']");
+        if (node is not { Attributes: not null })
+        {
+            return;
+        }
 
-    public override bool UsesExactMatches => true;
+        var versionAttribute = node.Attributes[VersionAttribute];
+        if (versionAttribute != null)
+        {
+            versionAttribute.Value = packageVersion;
+        }
+    }
 }

@@ -67,6 +67,24 @@ jobs:
           mv cyclonedx-linux-x64 cyclonedx
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
 
+      - name: "[Lint] - Install eclint on Linux"
+        if: runner.os != 'Windows'
+        run: |
+          curl -L https://gitlab.com/greut/eclint/-/releases/v$ECLINT_VERSION/downloads/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz -o /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz && \
+          mkdir -p $HOME/.local/opt/eclint && \
+          tar -zxvf /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz -C $HOME/.local/opt/eclint && \
+          rm /tmp/eclint_${ECLINT_VERSION}_linux_x86_64.tar.gz
+          echo "$HOME/.local/opt/eclint" >> $GITHUB_PATH
+
+      - name: "[Lint] - Install eclint on Windows"
+        if: runner.os == 'Windows'
+        run: |
+          New-Item -Type Directory -Force $HOME\.local\opt\eclint
+          Invoke-WebRequest -Uri https://gitlab.com/greut/eclint/-/releases/v$env:ECLINT_VERSION/downloads/eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz -OutFile $HOME\.local\opt\eclint\eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz
+          Set-Location $HOME\.local\opt\eclint
+          tar -zxvf .\eclint_${env:ECLINT_VERSION}_windows_x86_64.tar.gz
+          Write-Output "$HOME\.local\opt\eclint" | Out-File -Append $env:GITHUB_PATH
+
       - name: "[Setup] - Install CycloneDX dotnet as a global tool"
         run: |
           dotnet tool install --global CycloneDX
@@ -102,6 +120,10 @@ jobs:
       - name: "[Build]"
         run: |
           ruby bin/build.rb
+
+      - name: "[Lint]"
+        run: |
+          ruby bin/lint.rb
 
       - name: "[Test]"
         run: |

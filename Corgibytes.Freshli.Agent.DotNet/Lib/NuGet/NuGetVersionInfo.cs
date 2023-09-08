@@ -36,7 +36,7 @@ public class NuGetVersionInfo : IVersionInfo
                                         "for CompareTo()");
         }
 
-        int result = Major.CompareTo(other.Major);
+        var result = Major.CompareTo(other.Major);
         if (result != 0)
         {
             return result;
