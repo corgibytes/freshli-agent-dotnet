@@ -13,8 +13,7 @@ public class ManifestDetector
 
         IList<string> manifests = new List<string>();
 
-        var dirTree = Directory.GetDirectories(Path.GetFullPath(analysisPath));
-        var hashSet = new HashSet<string>(dirTree);
+        var hashSet = new HashSet<string> { analysisPath};
 
         while (hashSet.Count > 0)
         {
@@ -55,8 +54,9 @@ public class ManifestDetector
         return manifest;
     }
 
-    public static bool IsManifestFile(string file)
+    public static bool IsManifestFile(string filePath)
     {
-        return file.EndsWith(".csproj") || Path.GetFileName(file) == "packages.config";
+        var fileName = Path.GetFileName(filePath);
+        return fileName.EndsWith(".csproj") || fileName == "packages.config";
     }
 }
