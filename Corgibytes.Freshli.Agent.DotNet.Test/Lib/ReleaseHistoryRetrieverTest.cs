@@ -6,11 +6,7 @@ namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;
 
 public class ReleaseHistoryRetrieverTest
 {
-    private readonly ITestOutputHelper _output;
-
-    public ReleaseHistoryRetrieverTest(ITestOutputHelper output) => _output = output;
-
-    [Fact(Skip = "Attempting to determine which test is hanging")]
+    [Fact]
     public void Retrieve()
     {
         var packageReleases = new ReleaseHistoryRetriever()
