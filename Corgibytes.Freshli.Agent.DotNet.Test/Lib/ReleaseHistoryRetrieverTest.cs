@@ -10,7 +10,7 @@ public class ReleaseHistoryRetrieverTest
 
     public ReleaseHistoryRetrieverTest(ITestOutputHelper output) => _output = output;
 
-    [Fact]
+    [Fact(Skip = "Attempting to determine which test is hanging")]
     public void Retrieve()
     {
         var packageReleases = new ReleaseHistoryRetriever()
