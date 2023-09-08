@@ -9,7 +9,7 @@ public class ManifestProcessorTest
 {
     private readonly ManifestProcessor _manifestProcessor = new();
 
-    [Fact(Skip = "Attempting to determine which test is hanging")]
+    [Fact]
     public void ProcessProjectManifest()
     {
         var path = Fixtures.Path("csproj", "Project.csproj");
@@ -29,7 +29,7 @@ public class ManifestProcessorTest
         File.Delete(expectedBomFilePath);
     }
 
-    [Fact(Skip = "Attempting to determine which test is hanging")]
+    [Fact]
     public void ProcessPackagesManifest()
     {
         var path = Fixtures.Path("config", "packages.config");
@@ -50,7 +50,7 @@ public class ManifestProcessorTest
         File.Delete(expectedBomFilePath);
     }
 
-    [Fact(Skip = "Attempting to determine which test is hanging")]
+    [Fact]
     public void ProcessOpserverManifest()
     {
         // This manifest file results in an error, because one of the packages is no longer
