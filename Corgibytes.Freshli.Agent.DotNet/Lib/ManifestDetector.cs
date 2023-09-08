@@ -13,7 +13,7 @@ public class ManifestDetector
 
         IList<string> manifests = new List<string>();
 
-        var hashSet = new HashSet<string> { analysisPath};
+        var hashSet = new HashSet<string> { analysisPath };
 
         while (hashSet.Count > 0)
         {

@@ -40,8 +40,16 @@
     <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!--
+  Re-enable this block after this issue is fixed:
+  https://youtrack.jetbrains.com/issue/RSRP-490866/InspectCode-2022.3.1-incorrectly-reports-on-missing-MSBuild-tasks-in-Csproj-files
+
+  It is reporting a linter error for the RemoveDir task, but it is valid.
+  -->
+  <!--
   <Target Name="CleanFixtureDir" AfterTargets="Clean">
     <RemoveDir Directories="$(OutputPath)Fixtures" />
   </Target>
+  -->
 
 </Project>
