@@ -40,3 +40,22 @@ Feature: Invoking ProcessManifest via gRPC
     Then there are no services running on port 8392
     And the exit status should be 0
 
+  Scenario: Project with range expression using a date where the latest version is a pre-release
+    This project uses a range expression to reference the `Microsoft.Extensions.Logging.Abstractions` package.
+    On 10/01/2022, the latest version of that package was `7.0.0-rc.1.22426.10`. Since the start of the version range
+    references a stable version, `6.0.0`, then the pinned version should be `6.0.2`.
+
+    Given I clone the git repository "https://github.com/Nethereum/Nethereum" with the sha "a46cbd3b68ed1fdc309c6dff623dc1301d674e6d"
+    When I run `freshli-agent-dotnet start-server 8392` interactively
+    Then I wait for the freshli_agent.proto gRPC service to be running on port 8392
+    When I call ProcessManifest with the expanded path "tmp/repositories/Nethereum/src/Nethereum.JsonRpc.Client/Nethereum.JsonRpc.Client.csproj" and the moment "2022-10-01T00:00:00Z" on port 8392
+    Then the ProcessManifest response contains the following file paths expanded beneath "tmp/repositories/Nethereum/src/Nethereum.JsonRpc.Client":
+    """
+    obj/bom.json
+    """
+    And the CycloneDX file "tmp/repositories/Nethereum/src/Nethereum.JsonRpc.Client/obj/bom.json" should be valid
+    And the CycloneDX file "tmp/repositories/Nethereum/src/Nethereum.JsonRpc.Client/obj/bom.json" should contain "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@6.0.2"
+    And running git status should not report any modifications for "tmp/repositories/Nethereum"
+    When the gRPC service on port 8392 is sent the shutdown command
+    Then there are no services running on port 8392
+    And the exit status should be 0
