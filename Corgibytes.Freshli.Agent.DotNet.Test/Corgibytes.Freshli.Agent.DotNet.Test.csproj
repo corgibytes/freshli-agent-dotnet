@@ -1,10 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -14,43 +12,28 @@
         <PackageReference Include="coverlet.collector" Version="3.1.2" />
         <PackageReference Include="xunit" Version="2.5.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Corgibytes.Freshli.Agent.DotNet\Corgibytes.Freshli.Agent.DotNet.csproj" />
+        <ProjectReference Include="..\Corgibytes.Freshli.Agent.DotNet\Corgibytes.Freshli.Agent.DotNet.csproj" />
     </ItemGroup>
-  
-  <ItemGroup>
-    <FixtureFile Include="Fixtures\**" />
-  </ItemGroup>
 
-  <Target Name="CopyFixtures" AfterTargets="AfterBuild">
-    <Copy SourceFiles="@(FixtureFile)" DestinationFolder="$(OutDir)\Fixtures\%(RecursiveDir)" />
-  </Target>
-  
-  <Target Name="CleanFixtures" AfterTargets="Clean">
-    <RemoveDir Directories="$(OutDir)\Fixtures" />
-  </Target>
-  
-  <ItemGroup>
-    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+    <ItemGroup>
+        <FixtureFile Include="Fixtures\**" />
+    </ItemGroup>
 
+    <Target Name="CopyFixtures" AfterTargets="AfterBuild">
+        <Copy SourceFiles="@(FixtureFile)" DestinationFolder="$(OutDir)\Fixtures\%(RecursiveDir)" />
+    </Target>
 
-  <!--
-  Re-enable this block after this issue is fixed:
-  https://youtrack.jetbrains.com/issue/RSRP-490866/InspectCode-2022.3.1-incorrectly-reports-on-missing-MSBuild-tasks-in-Csproj-files
+    <Target Name="CleanFixtures" AfterTargets="Clean">
+        <RemoveDir Directories="$(OutDir)\Fixtures" />
+    </Target>
 
-  It is reporting a linter error for the RemoveDir task, but it is valid.
-  -->
-  <!--
-  <Target Name="CleanFixtureDir" AfterTargets="Clean">
-    <RemoveDir Directories="$(OutputPath)Fixtures" />
-  </Target>
-  -->
-
+    <ItemGroup>
+        <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 </Project>

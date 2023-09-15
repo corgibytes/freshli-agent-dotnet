@@ -1,5 +1,4 @@
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Xunit;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;

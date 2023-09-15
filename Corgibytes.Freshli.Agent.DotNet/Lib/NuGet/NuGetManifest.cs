@@ -43,9 +43,12 @@ public class NuGetManifest : IEnumerable<PackageInfo>
 
     private void ParseManifestXml()
     {
-        if (IsCentralVersionManagementEnabled()) {
+        if (IsCentralVersionManagementEnabled())
+        {
             ParseCentralVersionManagement();
-        } else {
+        }
+        else
+        {
             ParsePackageReferences();
         }
     }
@@ -53,7 +56,7 @@ public class NuGetManifest : IEnumerable<PackageInfo>
     private string? GetCentralVersionManagementVersion(string packageName)
     {
         var directoryPackagesProperties = _directoryPackagesProperties;
-        while(true)
+        while (true)
         {
             if (directoryPackagesProperties == null)
             {
@@ -77,10 +80,7 @@ public class NuGetManifest : IEnumerable<PackageInfo>
         {
             var packageName = package.Attributes![NameAttribute]!.Value;
             var packageVersion = GetCentralVersionManagementVersion(packageName);
-            if (packageVersion == null)
-            {
-                throw new Exception($"Could not find version for package {packageName}");
-            }
+            _ = packageVersion ?? throw new Exception($"Could not find version for package {packageName}");
 
             var overrideVersion = package.Attributes["VersionOverride"]?.Value;
             if (overrideVersion != null)
@@ -116,7 +116,7 @@ public class NuGetManifest : IEnumerable<PackageInfo>
         }
     }
 
-    private bool DoesDocumentEnableCentralVersionManagement(XmlDocument document)
+    private static bool DoesDocumentEnableCentralVersionManagement(XmlDocument document)
     {
         var packageManagement = document.SelectSingleNode("/Project/PropertyGroup/ManagePackageVersionsCentrally");
         return packageManagement is not null && packageManagement.InnerText == "true";
@@ -136,7 +136,8 @@ public class NuGetManifest : IEnumerable<PackageInfo>
 
     public void Update(string packageName, string packageVersion)
     {
-        if (IsCentralVersionManagementEnabled()) {
+        if (IsCentralVersionManagementEnabled())
+        {
             UpdateCentralVersionManagement(packageName, packageVersion);
         }
         else

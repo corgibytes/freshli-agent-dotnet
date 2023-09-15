@@ -8,7 +8,7 @@ public class NuGetDirectoryPackagesProperties
     private readonly string _directoryPackagesPropsFilePath;
     private readonly XmlDocument _propsXml;
     private bool _isDirty;
-    private string _backupDirectoryPackagesPropsFilePath;
+    private readonly string _backupDirectoryPackagesPropsFilePath;
     private const string BackupSuffix = ".versionsBackup";
 
     private NuGetDirectoryPackagesProperties(string directoryPackagesPropsFilePath)

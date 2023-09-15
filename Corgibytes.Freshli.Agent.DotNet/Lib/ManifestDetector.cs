@@ -1,4 +1,3 @@
-using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
