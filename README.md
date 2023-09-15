@@ -17,7 +17,7 @@ This application is used by the [`freshli` CLI](https://github.com/corgibytes/fr
   * `bundler` gem version 2.4.18
   * Be able to install gems without being logged in as root
 * [eclint](https://gitlab.com/greut/eclint) version 0.3.3
-* [CycloneDX CLI](https://github.com/CycloneDX/cyclonedx-cli) version 0.24.0 
+* [CycloneDX CLI](https://github.com/CycloneDX/cyclonedx-cli) version 0.24.0
 
 
 ### Building
