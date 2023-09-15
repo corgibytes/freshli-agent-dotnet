@@ -38,7 +38,8 @@ public class Versions
             s_logger.LogTrace("Package {PackageId} has specified version range = {Version}",
                 node.Name, versionRange.ToNormalizedString());
 
-            var releaseHistory = repository.GetReleaseHistory(node.Name, false)
+            var shouldRetrievePreReleasePackages = versionRange.MinVersion.IsPrerelease;
+            var releaseHistory = repository.GetReleaseHistory(node.Name, shouldRetrievePreReleasePackages)
                 .Where(release => release.DatePublished <= asOfDate);
 
             var latestVersion = new NuGetVersion(0, 0, 0);
