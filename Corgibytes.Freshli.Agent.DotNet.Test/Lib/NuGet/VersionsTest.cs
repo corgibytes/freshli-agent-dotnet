@@ -36,21 +36,16 @@ public class VersionsTest
 
     [Theory]
     [MemberData(nameof(UpdatePackagesManifestArgs))]
-    public void UpdatePackagesManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
+    public void UpdatePackagesManifest(string[] manifestFixturePath, string date)
     {
         var manifestFilePath = Fixtures.Path(manifestFixturePath);
-        File.WriteAllText(manifestFilePath, File.ReadAllText(manifestFilePath));
+        var expectedHash = Hash(File.ReadAllText(manifestFilePath));
 
         Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         try
         {
-            var manifest = new PackagesManifest();
-            manifest.Parse(File.ReadAllText(manifestFilePath));
-            foreach (var expected in expectedUpdates)
-            {
-                var packageInfo = manifest[expected.Name];
-                Assert.Equal(expected.Version, packageInfo.Version);
-            }
+            var actualHash = Hash(File.ReadAllText(manifestFilePath));
+            Assert.Equal(expectedHash, actualHash);
         }
         finally
         {
@@ -61,6 +56,11 @@ public class VersionsTest
                 File.Delete(manifestFilePath);
             }
         }
+    }
+
+    private static string Hash(string input)
+    {
+        return Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(input)));
     }
 
     public static IEnumerable<object?[]> UpdateNuGetManifestArgs =>
@@ -100,17 +100,14 @@ public class VersionsTest
             new object?[]
             {
                 new[] { "config", "packages.config" }, "2015-06-10T00:00:00.0000000Z",
-                new[] { new PackageInfo("NLog", "4.0.0") }
             },
             new object?[]
             {
                 new[] { "config", "packages.config" }, "2019-12-31T00:00:00.0000000Z",
-                new[] { new PackageInfo("NLog", "4.0.0") }
             },
             new object?[]
             {
                 new[] { "config", "packages.config" }, "2023-09-05T00:00:00.0000000Z",
-                new[] { new PackageInfo("NLog", "4.0.0") }
             }
         };
 
