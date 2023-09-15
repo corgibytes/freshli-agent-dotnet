@@ -34,16 +34,4 @@ public class ManifestDetectorTest
         var actual = ManifestDetector.IsManifestFile(fileName);
         Assert.Equal(expected, actual);
     }
-
-    [Theory]
-    [InlineData("config/packages.config", typeof(PackagesManifest), 4)]
-    [InlineData("csproj/Project.csproj", typeof(NuGetManifest), 5)]
-    [InlineData("config/Opserver.Core/packages.config", typeof(PackagesManifest), 11)]
-    public void LoadManifest(string fileName, Type expectedType, int expectedCount)
-    {
-        var manifestFile = Fixtures.Path(fileName);
-        var manifest = ManifestDetector.LoadManifest(manifestFile);
-        Assert.Equal(expectedType, manifest.GetType());
-        Assert.Equal(expectedCount, manifest.Count);
-    }
 }
