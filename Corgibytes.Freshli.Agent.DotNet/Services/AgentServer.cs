@@ -45,8 +45,8 @@ public class AgentServer
         builder.Services.AddGrpc(configure => configure.EnableDetailedErrors = true);
         builder.Services.AddGrpcHealthChecks(configure =>
         {
-            configure.Services.MapService("", result => true);
-            configure.Services.MapService("com.corgibytes.freshli.agent.Agent", result => true);
+            configure.Services.Map("", result => true);
+            configure.Services.Map("com.corgibytes.freshli.agent.Agent", result => true);
         })
             .AddCheck("com.corgibytes.freshli.agent.Agent", () => HealthCheckResult.Healthy());
 
