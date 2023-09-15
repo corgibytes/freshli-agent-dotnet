@@ -1,4 +1,3 @@
-using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Microsoft.Extensions.Logging;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Lib;
@@ -35,23 +34,6 @@ public class ManifestDetector
         }
 
         return manifests.Order();
-    }
-
-    public static AbstractManifest LoadManifest(string file)
-    {
-        AbstractManifest manifest;
-        if (Path.GetFileName(file) == "packages.config")
-        {
-            manifest = new PackagesManifest();
-            manifest.Parse(File.ReadAllText(file));
-        }
-        else
-        {
-            manifest = new NuGetManifest();
-            manifest.Parse(File.ReadAllText(file));
-        }
-
-        return manifest;
     }
 
     public static bool IsManifestFile(string filePath)

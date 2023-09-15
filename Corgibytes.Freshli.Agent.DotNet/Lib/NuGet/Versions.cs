@@ -6,7 +6,6 @@ namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 public class Versions
 {
     private static readonly ILogger<Versions> s_logger = Logging.Logger<Versions>();
-    public const string BackupSuffix = ".versionsBackup";
 
     public static void UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
     {
@@ -16,17 +15,12 @@ public class Versions
         }
 
         s_logger.LogTrace("Update({ManifestFilePath}, {AsOfDate})", manifestFilePath, asOfDate);
-        File.Copy(manifestFilePath, manifestFilePath + BackupSuffix, true);
-        var manifest = new NuGetManifest();
-        var repository = new NuGetRepository();
-
-        manifest.Parse(File.ReadAllText(manifestFilePath));
+        var manifest = new NuGetManifest(manifestFilePath);
         if (manifest.Count <= 0)
         {
             return;
         }
 
-        var manifestIsDirty = false;
         foreach (var node in manifest)
         {
             var versionRange = VersionRange.Parse(node.Version);
@@ -39,6 +33,7 @@ public class Versions
                 node.Name, versionRange.ToNormalizedString());
 
             var shouldRetrievePreReleasePackages = versionRange.MinVersion.IsPrerelease;
+            var repository = new NuGetRepository();
             var releaseHistory = repository.GetReleaseHistory(node.Name, shouldRetrievePreReleasePackages)
                 .Where(release => release.DatePublished <= asOfDate);
 
@@ -58,23 +53,17 @@ public class Versions
             if (latestVersion.CompareTo(new NuGetVersion(0, 0, 0)) != 0)
             {
                 manifest.Update(node.Name, latestVersion.ToString());
-                manifestIsDirty = true;
                 s_logger.LogDebug("Updating {PackageId} to version = {Version} published on {PublishedOn}",
                     node.Name, latestVersion, latestPublished);
             }
         }
 
-        if (manifestIsDirty)
-        {
-            manifest.Save(manifestFilePath);
-        }
+        manifest.Save();
     }
 
     public static void RestoreManifest(string manifestFilePath)
     {
-        if (File.Exists(manifestFilePath + BackupSuffix))
-        {
-            File.Move(manifestFilePath + BackupSuffix, manifestFilePath, true);
-        }
+        var manifest = new NuGetManifest(manifestFilePath);
+        manifest.Restore();
     }
 }

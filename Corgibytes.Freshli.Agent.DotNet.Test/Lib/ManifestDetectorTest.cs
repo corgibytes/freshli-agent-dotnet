@@ -1,5 +1,4 @@
 using Corgibytes.Freshli.Agent.DotNet.Lib;
-using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
 using Xunit;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib;
@@ -19,7 +18,7 @@ public class ManifestDetectorTest
             Assert.Equal(Path.GetFullPath(manifestFile), manifestFile);
         }
 
-        Assert.Equal(3, manifestFiles.Length);
+        Assert.Equal(12, manifestFiles.Length);
     }
 
     [Theory]
@@ -33,17 +32,5 @@ public class ManifestDetectorTest
     {
         var actual = ManifestDetector.IsManifestFile(fileName);
         Assert.Equal(expected, actual);
-    }
-
-    [Theory]
-    [InlineData("config/packages.config", typeof(PackagesManifest), 4)]
-    [InlineData("csproj/Project.csproj", typeof(NuGetManifest), 5)]
-    [InlineData("config/Opserver.Core/packages.config", typeof(PackagesManifest), 11)]
-    public void LoadManifest(string fileName, Type expectedType, int expectedCount)
-    {
-        var manifestFile = Fixtures.Path(fileName);
-        var manifest = ManifestDetector.LoadManifest(manifestFile);
-        Assert.Equal(expectedType, manifest.GetType());
-        Assert.Equal(expectedCount, manifest.Count);
     }
 }

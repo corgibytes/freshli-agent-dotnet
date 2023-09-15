@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>dev-$([System.DateTime]::Now.ToString("yyyyMMddTHHmm"))</VersionSuffix>
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNetEnv" VersionOverride="[1.0,3.0)" />
+    <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="LibGit2Sharp" />
+    <PackageReference Include="NLog" />
+    <PackageReference Include="RestSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

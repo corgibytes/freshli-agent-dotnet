@@ -87,7 +87,7 @@ if perform_resharper
   if status.success?
     execute(
       'dotnet jb inspectcode --build --output=resharper.temp --format=text ' \
-      "--toolset-path=\"#{msbuild_dll_path}\" freshli-agent-dotnet.sln"
+      "--toolset-path=\"#{msbuild_dll_path}\" --exclude=\"**/*.csproj\" freshli-agent-dotnet.sln"
     )
     File.open('resharper.temp', 'r') do |f|
       result = f.readlines

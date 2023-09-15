@@ -80,3 +80,23 @@ Feature: Invoking ProcessManifest via gRPC
     When the gRPC service on port 8392 is sent the shutdown command
     Then there are no services running on port 8392
     And the exit status should be 0
+
+  Scenario: Project with range expression defined using central version management
+    This project uses a range expression to reference the `Google.Protobuf` package, and the version range is defined
+    using central version management. On 08/27/2023, the latest version of that package which satisfies the full range
+    is `3.24.2`.
+
+    Given I clone the git repository "https://github.com/open-telemetry/opentelemetry-dotnet" with the sha "e9d0e2b0351c1ea1c65173e44da738a193b0e8e5"
+    When I run `freshli-agent-dotnet start-server 8392` interactively
+    Then I wait for the freshli_agent.proto gRPC service to be running on port 8392
+    When I call ProcessManifest with the expanded path "tmp/repositories/opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/OpenTelemetry.Exporter.OpenTelemetryProtocol.csproj" and the moment "2023-08-27T00:00:00Z" on port 8392
+    Then the ProcessManifest response contains the following file paths expanded beneath "tmp/repositories/opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol":
+    """
+    obj/bom.json
+    """
+    And the CycloneDX file "tmp/repositories/opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/obj/bom.json" should be valid
+    And the CycloneDX file "tmp/repositories/opentelemetry-dotnet/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/obj/bom.json" should contain "pkg:nuget/Google.Protobuf@3.24.2"
+    And running git status should not report any modifications for "tmp/repositories/opentelemetry-dotnet"
+    When the gRPC service on port 8392 is sent the shutdown command
+    Then there are no services running on port 8392
+    And the exit status should be 0
