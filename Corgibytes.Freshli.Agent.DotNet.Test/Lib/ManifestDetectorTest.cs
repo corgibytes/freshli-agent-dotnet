@@ -19,7 +19,7 @@ public class ManifestDetectorTest
             Assert.Equal(Path.GetFullPath(manifestFile), manifestFile);
         }
 
-        Assert.Equal(3, manifestFiles.Length);
+        Assert.Equal(12, manifestFiles.Length);
     }
 
     [Theory]

@@ -15,8 +15,7 @@ public static class Fixtures
 
         if (!Directory.Exists(pristineResult) && !File.Exists(pristineResult))
         {
-            throw new FixtureNotFoundException(
-                "The specified file or directory was not found within the `Fixtures` directory tree", pristineResult);
+            throw new FixtureNotFoundException(pristineResult);
         }
 
         // create temp directory and then copy the fixture to it
@@ -67,7 +66,7 @@ public static class Fixtures
 
     private class FixtureNotFoundException : FileNotFoundException
     {
-        public FixtureNotFoundException(string message, string value) : base(message, value)
+        public FixtureNotFoundException(string value) : base($"File or directory not found within the `Fixtures` directory tree: {value}", value)
         {
         }
     }

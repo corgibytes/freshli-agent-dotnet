@@ -23,22 +23,23 @@
     <ItemGroup>
       <ProjectReference Include="..\Corgibytes.Freshli.Agent.DotNet\Corgibytes.Freshli.Agent.DotNet.csproj" />
     </ItemGroup>
-
+  
   <ItemGroup>
-    <None Update="Fixtures\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Fixtures\config\Opserver.Core\packages.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Fixtures\csproj\Project.csproj">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <FixtureFile Include="Fixtures\**" />
   </ItemGroup>
 
+  <Target Name="CopyFixtures" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(FixtureFile)" DestinationFolder="$(OutDir)\Fixtures\%(RecursiveDir)" />
+  </Target>
+  
+  <Target Name="CleanFixtures" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutDir)\Fixtures" />
+  </Target>
+  
   <ItemGroup>
     <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
 
   <!--
   Re-enable this block after this issue is fixed:
