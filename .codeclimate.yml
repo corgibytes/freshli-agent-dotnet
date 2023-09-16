@@ -20,4 +20,3 @@ checks:
       threshold: 7
   similar-code:
     enabled: false
- 
