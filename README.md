@@ -82,7 +82,7 @@ dotnet test
 And the application's acceptance tests can be run with:
 
 ```bash
-dotnet build -o exe Corgibytes.Freshli.Agent.DotNet 
+dotnet build -o exe Corgibytes.Freshli.Agent.DotNet
 bundle exec cucumber
 ```
 
