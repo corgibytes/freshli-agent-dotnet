@@ -1,0 +1,23 @@
+version: "2"
+exclude_patterns:
+  - "Corgibytes.Freshli.Agent.DotNet/obj/**"
+  - "Corgibytes.Freshli.Agent.DotNet.Test/**"
+  - "**/*.Designer.cs"
+
+checks:
+  method-lines:
+    config:
+      threshold: 65
+  file-lines:
+    config:
+      threshold: 300
+  method-count:
+    config:
+      threshold: 25
+  argument-count:
+    enabled: true
+    config:
+      threshold: 7
+  similar-code:
+    enabled: false
+ 
