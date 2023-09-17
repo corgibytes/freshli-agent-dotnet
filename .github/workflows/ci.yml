@@ -127,7 +127,7 @@ jobs:
 
       - name: "[Test] - Test and Collect Code Coverage"
         run: |
-          dotnet coverlet ./exe --target "ruby" --targetargs 'bin/test.rb' --format lcov
+          dotnet coverlet ./exe --target "ruby" --targetargs 'bin/test.rb --skip-build' --format lcov
 
       - name: "[Test] - Send Code Coverage Data to Code Climate"
         uses: paambaati/codeclimate-action@v5.0.0
