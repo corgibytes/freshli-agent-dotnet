@@ -125,6 +125,15 @@ jobs:
         run: |
           ruby bin/lint.rb
 
-      - name: "[Test]"
+      - name: "[Test] - Test and Collect Code Coverage"
         run: |
-          ruby bin/test.rb
+          dotnet coverlet ./exe --target "ruby" --targetargs 'bin/test.rb --skip-build' --format lcov
+
+      - name: "[Test] - Send Code Coverage Data to Code Climate"
+        uses: paambaati/codeclimate-action@v5.0.0
+        if: ${{ github.actor != 'dependabot[bot]' && runner.os != 'Windows' }}
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.TEST_REPORTER_ID }}
+        with:
+          coverageLocations: |
+            ${{github.workspace}}/coverage.info:lcov
