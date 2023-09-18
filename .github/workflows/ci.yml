@@ -143,3 +143,4 @@ jobs:
         with:
           coverageLocations: |
             ${{github.workspace}}/coverage.info:lcov
+          prefix: ${{github.workspace}}
