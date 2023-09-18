@@ -11,7 +11,7 @@ This application is used by the [`freshli` CLI](https://github.com/corgibytes/fr
 #### Runtime Requirements
 
 * DotNet SDK version 7.0.400
-* The CycloneDX `dotnet tool` needs to be installed in such a way that it is accessible by running `DotNet-CycloneDX`. Running `dotnet tool restore` will install a compatible version, but you'll need to make sure that the install location is referenced in your `PATH`.
+* The CycloneDX `dotnet tool` needs to be installed in such a way that it is accessible by running `dotnet-CycloneDX`. Running `dotnet tool restore` will install a compatible version, but you'll need to make sure that the install location is referenced in your `PATH`.
 
 #### Development Requirements
 
