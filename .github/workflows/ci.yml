@@ -129,6 +129,12 @@ jobs:
         run: |
           dotnet coverlet ./exe --target "ruby" --targetargs 'bin/test.rb --skip-build' --format lcov
 
+      - name: "[Test] - Upload coverage as build artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage.info
+
       - name: "[Test] - Send Code Coverage Data to Code Climate"
         uses: paambaati/codeclimate-action@v5.0.0
         if: ${{ github.actor != 'dependabot[bot]' && runner.os != 'Windows' }}
