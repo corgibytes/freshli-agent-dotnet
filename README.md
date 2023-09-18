@@ -1,3 +1,5 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/484b4749424297461774/maintainability)](https://codeclimate.com/github/corgibytes/freshli-agent-dotnet/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/484b4749424297461774/test_coverage)](https://codeclimate.com/github/corgibytes/freshli-agent-dotnet/test_coverage)
+
 # Freshli Agent: DotNet
 
 This application is used by the [`freshli` CLI](https://github.com/corgibytes/freshli-cli) to detect and process manifest files from the DotNet (.NET) ecosystem.
