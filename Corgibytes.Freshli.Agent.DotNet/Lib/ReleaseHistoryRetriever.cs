@@ -7,13 +7,13 @@ public sealed class ReleaseHistoryRetriever
 {
     private readonly NuGetRepository _nuGetRepository = new();
 
-    public List<PackageReleaseData> Retrieve(string packageUrl)
+    public async Task<List<PackageReleaseData>> Retrieve(string packageUrl)
     {
         try
         {
             var purl = new PackageURL(packageUrl);
 
-            var releaseHistory = _nuGetRepository.GetReleaseHistory(purl.Name, true);
+            var releaseHistory = await _nuGetRepository.GetReleaseHistory(purl.Name, true);
             var results = releaseHistory.Select(release =>
                 new PackageReleaseData(
                     release.Version,

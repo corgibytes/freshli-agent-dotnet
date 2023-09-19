@@ -10,10 +10,10 @@ public class VersionsTest
 {
     [Theory]
     [MemberData(nameof(UpdateNuGetManifestArgs))]
-    public void UpdateNuGetManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
+    public async Task UpdateNuGetManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
     {
         var manifestFilePath = Fixtures.Path(manifestFixturePath);
-        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
+        await Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         try
         {
             var manifest = new NuGetManifest(manifestFilePath);
@@ -36,15 +36,15 @@ public class VersionsTest
 
     [Theory]
     [MemberData(nameof(UpdatePackagesManifestArgs))]
-    public void UpdatePackagesManifest(string[] manifestFixturePath, string date)
+    public async Task UpdatePackagesManifest(string[] manifestFixturePath, string date)
     {
         var manifestFilePath = Fixtures.Path(manifestFixturePath);
-        var expectedHash = Hash(File.ReadAllText(manifestFilePath));
+        var expectedHash = Hash(await File.ReadAllTextAsync(manifestFilePath));
 
-        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
+        await Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         try
         {
-            var actualHash = Hash(File.ReadAllText(manifestFilePath));
+            var actualHash = Hash(await File.ReadAllTextAsync(manifestFilePath));
             Assert.Equal(expectedHash, actualHash);
         }
         finally
