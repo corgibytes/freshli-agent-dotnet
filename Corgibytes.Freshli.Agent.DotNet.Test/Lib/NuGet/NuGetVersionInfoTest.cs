@@ -93,6 +93,15 @@ public class NuGetVersionInfoTest
     }
 
     [Fact]
+    public void VersionStripsMetadata()
+    {
+        const string version = "5.0.0+42a8779499c1d1ed2488c2e6b9e2ee6ff6107766";
+        var versionInfo = BuildNuGetVersionInfoFrom(version);
+
+        Assert.Equal("5.0.0", versionInfo.Version);
+    }
+
+    [Fact]
     public void ThrowsExceptionIfNull()
     {
         Assert.Throws<ArgumentException>(() =>
