@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -8,7 +9,7 @@ namespace Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
     *  This serves as a wrapper for the 'NuGetVersion' class in the NuGet
     *  Client SDK.
     */
-public partial class NuGetVersionInfo : IVersionInfo
+public class NuGetVersionInfo : IVersionInfo
 {
     private readonly IPackageSearchMetadata _packageSearchMetadata;
     private readonly IEnumerable<IPackageSearchMetadata> _siblingReleases;
@@ -21,7 +22,8 @@ public partial class NuGetVersionInfo : IVersionInfo
 
     private NuGetVersion NuGetVersion => _packageSearchMetadata.Identity.Version;
 
-    private static readonly Regex s_versionMetadataRegex = VersionMetadataRegex();
+    [SuppressMessage("GeneratedRegex", "SYSLIB1045:Convert to \'GeneratedRegexAttribute\'.")]
+    private static readonly Regex s_versionMetadataRegex = new("\\+[a-zA-Z0-9]+");
 
     private static string StripVersionMetadata(string version)
     {
@@ -110,7 +112,4 @@ public partial class NuGetVersionInfo : IVersionInfo
 
         return NuGetVersion.CompareTo(other.NuGetVersion);
     }
-
-    [GeneratedRegex("\\+[a-zA-Z0-9]+")]
-    private static partial Regex VersionMetadataRegex();
 }
