@@ -7,7 +7,7 @@ public class Versions
 {
     private static readonly ILogger<Versions> s_logger = Logging.Logger<Versions>();
 
-    public static void UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
+    public static async void UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
     {
         if (manifestFilePath.EndsWith(".config"))
         {
@@ -34,7 +34,7 @@ public class Versions
 
             var shouldRetrievePreReleasePackages = versionRange.MinVersion.IsPrerelease;
             var repository = new NuGetRepository();
-            var releaseHistory = repository.GetReleaseHistory(node.Name, shouldRetrievePreReleasePackages)
+            var releaseHistory = (await repository.GetReleaseHistory(node.Name, shouldRetrievePreReleasePackages))
                 .Where(release => release.DatePublished <= asOfDate);
 
             var latestVersion = new NuGetVersion(0, 0, 0);

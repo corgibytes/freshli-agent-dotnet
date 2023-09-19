@@ -11,7 +11,7 @@ public class ManifestProcessor
 {
     private readonly ILogger<ManifestProcessor> _logger = Logging.Logger<ManifestProcessor>();
 
-    public string ProcessManifest(string manifestFilePath, DateTimeOffset? asOfDate)
+    public async Task<string> ProcessManifest(string manifestFilePath, DateTimeOffset? asOfDate)
     {
         if (!File.Exists(manifestFilePath))
         {
@@ -56,7 +56,7 @@ public class ManifestProcessor
                 Path.Combine(outDir, destFileName));
         }
 
-        var commandResult = Cli.Wrap("dotnet-CycloneDX")
+        var commandResult = await Cli.Wrap("dotnet-CycloneDX")
             .WithArguments(new List<string>
             {
                 manifestFilePath,
@@ -70,9 +70,7 @@ public class ManifestProcessor
             .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
             .WithValidation(CommandResultValidation.None)
             // TODO: Pass in a cancellation token that will get triggered if Shutdown is called
-            .ExecuteAsync()
-            .Task
-            .Result;
+            .ExecuteAsync();
 
         if (asOfDate != null)
         {

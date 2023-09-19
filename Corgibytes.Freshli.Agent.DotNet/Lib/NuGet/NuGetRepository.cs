@@ -9,7 +9,7 @@ public class NuGetRepository
     private readonly IDictionary<string, IEnumerable<NuGetVersionInfo>> _packages
         = new Dictionary<string, IEnumerable<NuGetVersionInfo>>();
 
-    public IEnumerable<IVersionInfo> GetReleaseHistory(
+    public async Task<IEnumerable<IVersionInfo>> GetReleaseHistory(
         string name,
         bool includePreReleaseVersions
     )
@@ -19,18 +19,15 @@ public class NuGetRepository
             return history;
         }
 
-        var versions = GetMetadata(name, includePreReleaseVersions);
+        var versions = (await GetMetadata(name, includePreReleaseVersions)).ToList();
         _packages[name] = versions
             .OrderByDescending(nv => nv.Published)
-            .Select(v => new NuGetVersionInfo(
-                v.Identity.Version,
-                v.Published!.Value.UtcDateTime
-            ));
+            .Select(v => new NuGetVersionInfo(v, versions));
 
         return _packages[name];
     }
 
-    private static IEnumerable<IPackageSearchMetadata> GetMetadata(string name, bool includePreReleaseVersions)
+    private static async Task<IEnumerable<IPackageSearchMetadata>> GetMetadata(string name, bool includePreReleaseVersions)
     {
         var logger = NullLogger.Instance;
         var cancellationToken = CancellationToken.None;
@@ -40,15 +37,15 @@ public class NuGetRepository
             "https://api.nuget.org/v3/index.json"
         );
         var resource =
-            repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).Result;
+            await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken);
 
-        var packages = resource.GetMetadataAsync(
+        var packages = await resource.GetMetadataAsync(
             name,
             includePrerelease: includePreReleaseVersions,
-            includeUnlisted: false,
+            includeUnlisted: true,
             cache,
             logger,
-            cancellationToken).Result;
+            cancellationToken);
 
         return packages;
     }

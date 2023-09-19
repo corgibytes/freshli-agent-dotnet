@@ -19,7 +19,7 @@ public class AgentService : Agent.AgentBase
         _manifestProcessor = new ManifestProcessor();
     }
 
-    public override Task<BomLocation> ProcessManifest(ProcessingRequest request, ServerCallContext context)
+    public override async Task<BomLocation> ProcessManifest(ProcessingRequest request, ServerCallContext context)
     {
         var asOfDate = request.Moment?.ToDateTimeOffset() ?? DateTimeOffset.Now;
         _logger.LogInformation("ProcessManifest() - manifestPath: {ManifestPath}, asOfDate: {AsOfDate}",
@@ -27,8 +27,8 @@ public class AgentService : Agent.AgentBase
         try
         {
             var bomLocation =
-                _manifestProcessor.ProcessManifest(request.Manifest.Path, asOfDate);
-            return Task.FromResult(new BomLocation() { Path = bomLocation });
+                await _manifestProcessor.ProcessManifest(request.Manifest.Path, asOfDate);
+            return new BomLocation() { Path = bomLocation };
         }
         catch (ManifestProcessingException error)
         {
@@ -36,42 +36,39 @@ public class AgentService : Agent.AgentBase
             _logger.LogWarning("{ErrorMessage}", errorMessage);
             _logger.LogDebug("Exception.details: {Detail}", error.Details);
 
-            return Task.FromResult(new BomLocation() { Path = "" });
+            return new BomLocation() { Path = "" };
         }
     }
 
-    public override Task DetectManifests(ProjectLocation request, IServerStreamWriter<ManifestLocation> responseStream,
+    public override async Task DetectManifests(ProjectLocation request, IServerStreamWriter<ManifestLocation> responseStream,
         ServerCallContext context)
     {
         var projectLocation = request.Path;
         _logger.LogInformation("DetectManifests() - {ProjectLocation}", projectLocation);
         foreach (var filename in new ManifestDetector().FindManifests(projectLocation))
         {
-            responseStream.WriteAsync(
+            await responseStream.WriteAsync(
                 new ManifestLocation() { Path = Path.Combine(projectLocation, filename) },
                 context.CancellationToken
             );
         }
-
-        return Task.CompletedTask;
     }
 
-    public override Task RetrieveReleaseHistory(Package request, IServerStreamWriter<PackageRelease> responseStream,
+    public override async Task RetrieveReleaseHistory(Package request, IServerStreamWriter<PackageRelease> responseStream,
         ServerCallContext context)
     {
         var packageUrl = request.Purl;
         _logger.LogInformation("RetrieveReleaseHistory() - {RequestPurl}", packageUrl);
-        var packageReleases = new ReleaseHistoryRetriever().Retrieve(packageUrl);
-        packageReleases
-            .ForEach(release =>
+        var releaseRetriever = new ReleaseHistoryRetriever();
+        var packageReleases = await releaseRetriever.Retrieve(packageUrl);
+        foreach (var release in packageReleases)
+        {
+            await responseStream.WriteAsync(new PackageRelease()
             {
-                responseStream.WriteAsync(new PackageRelease()
-                {
-                    ReleasedAt = release.ReleasedAt.ToTimestamp(),
-                    Version = release.Version
-                }, context.CancellationToken);
-            });
-        return Task.CompletedTask;
+                ReleasedAt = release.ReleasedAt.ToTimestamp(),
+                Version = release.Version
+            }, context.CancellationToken);
+        }
     }
 
     public override Task<Empty> Shutdown(Empty request, ServerCallContext context)
@@ -81,29 +78,25 @@ public class AgentService : Agent.AgentBase
         return Task.FromResult(new Empty());
     }
 
-    public override Task GetValidatingPackages(Empty request, IServerStreamWriter<Package> responseStream,
+    public override async Task GetValidatingPackages(Empty request, IServerStreamWriter<Package> responseStream,
         ServerCallContext context)
     {
         _logger.LogInformation("GetValidatingPackages()");
         var packageUrls = ValidatingData.PackageUrls();
         foreach (var packageUrl in packageUrls)
         {
-            responseStream.WriteAsync(new Package() { Purl = packageUrl }, context.CancellationToken);
+            await responseStream.WriteAsync(new Package() { Purl = packageUrl }, context.CancellationToken);
         }
-
-        return Task.CompletedTask;
     }
 
-    public override Task GetValidatingRepositories(Empty request,
+    public override async Task GetValidatingRepositories(Empty request,
         IServerStreamWriter<RepositoryLocation> responseStream, ServerCallContext context)
     {
         _logger.LogInformation("GetValidatingRepositories()");
         var repositoryUrls = ValidatingData.RepositoryUrls();
         foreach (var repositoryUrl in repositoryUrls)
         {
-            responseStream.WriteAsync(new RepositoryLocation() { Url = repositoryUrl }, context.CancellationToken);
+            await responseStream.WriteAsync(new RepositoryLocation() { Url = repositoryUrl }, context.CancellationToken);
         }
-
-        return Task.CompletedTask;
     }
 }
