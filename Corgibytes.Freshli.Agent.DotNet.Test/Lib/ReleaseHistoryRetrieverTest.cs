@@ -111,7 +111,7 @@ public class ReleaseHistoryRetrieverTest
 
         var releaseDatesByVersion = new Dictionary<string, DateTimeOffset>
         {
-            { "5.11.0", DateTimeOffset.Parse("1900-01-01T00:00:00.0000000+00:00") },// DateTimeOffset.Parse("2021-08-12T23:42:43.8430000+00:00") },
+            { "5.11.0", DateTimeOffset.Parse("2022-02-12T05:39:14.7850000+00:00") },
             { "6.7.0", DateTimeOffset.Parse("2023-08-09T20:56:19.7100000+00:00") },
         };
 
