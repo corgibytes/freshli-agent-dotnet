@@ -1,9 +1,9 @@
 using Corgibytes.Freshli.Agent.DotNet.Lib.NuGet;
+using Moq;
+using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using Xunit;
-using Moq;
-using NuGet.Packaging.Core;
 
 namespace Corgibytes.Freshli.Agent.DotNet.Test.Lib.NuGet;
 
