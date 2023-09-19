@@ -21,7 +21,7 @@ public class ManifestProcessor
         _logger.LogDebug("Processing manifest at {ManifestFilePath} as of {AsOfDate}", manifestFilePath, asOfDate);
         if (asOfDate != null)
         {
-            Versions.UpdateManifest(manifestFilePath, asOfDate.Value);
+            await Versions.UpdateManifest(manifestFilePath, asOfDate.Value);
         }
 
         var manifestDir = new DirectoryInfo(manifestFilePath);
