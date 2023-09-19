@@ -18,6 +18,11 @@ Feature: Invoking RetrieveReleaseHistory via gRPC
     Then RetrieveReleaseHistory response should contain the following versions and release dates:
     """
     0.4.0-alpha0116	2021-05-17T12:54:26.4800000Z
+    0.0.0-rc1	2021-05-17T12:54:26.480000000Z
+    0.0.0	2021-05-17T12:54:26.480000000Z
+    0.0.2	2021-05-17T12:54:26.480000000Z
+    0.0.3	2021-05-17T12:54:26.480000000Z
+    0.0.4	2021-05-17T12:54:26.480000000Z
     0.4.0-alpha0117	2021-05-17T12:55:16.0200000Z
     0.4.0-alpha0121	2021-05-17T13:06:07.4930000Z
     0.4.0-alpha0124	2021-05-17T13:12:20.7570000Z
