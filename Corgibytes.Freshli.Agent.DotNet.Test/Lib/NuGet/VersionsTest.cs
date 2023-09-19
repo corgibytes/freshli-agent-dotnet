@@ -10,10 +10,10 @@ public class VersionsTest
 {
     [Theory]
     [MemberData(nameof(UpdateNuGetManifestArgs))]
-    public void UpdateNuGetManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
+    public async Task UpdateNuGetManifest(string[] manifestFixturePath, string date, PackageInfo[] expectedUpdates)
     {
         var manifestFilePath = Fixtures.Path(manifestFixturePath);
-        Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
+        await Versions.UpdateManifest(manifestFilePath, DateTimeOffset.Parse(date));
         try
         {
             var manifest = new NuGetManifest(manifestFilePath);

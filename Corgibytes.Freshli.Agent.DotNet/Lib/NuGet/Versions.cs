@@ -7,7 +7,7 @@ public class Versions
 {
     private static readonly ILogger<Versions> s_logger = Logging.Logger<Versions>();
 
-    public static async void UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
+    public static async Task UpdateManifest(string manifestFilePath, DateTimeOffset asOfDate)
     {
         if (manifestFilePath.EndsWith(".config"))
         {
