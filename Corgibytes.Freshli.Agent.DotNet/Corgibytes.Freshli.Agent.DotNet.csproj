@@ -23,7 +23,7 @@
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.57.0" />
     <PackageReference Include="Grpc.Core" Version="2.46.6" />
     <PackageReference Include="Grpc.HealthCheck" Version="2.57.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.58.0">
+    <PackageReference Include="Grpc.Tools" Version="2.59.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
