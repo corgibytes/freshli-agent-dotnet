@@ -130,7 +130,7 @@ jobs:
           dotnet coverlet ./exe --target "ruby" --targetargs 'bin/test.rb --skip-build' --format lcov
 
       - name: "[Test] - Upload coverage as build artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage.info
